@@ -1,0 +1,111 @@
+.container {
+  padding: 2rem;
+}
+
+.hero {
+  margin-bottom: 2.5rem;
+  text-align: center;
+}
+
+.hero h2 {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+}
+
+.hero p {
+  color: var(--text-muted);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.categoryNav {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+  padding: 0.5rem 0.25rem 1rem;
+}
+
+.categoryNav button {
+  white-space: nowrap;
+  min-width: fit-content;
+  padding: 0.6rem 1.25rem;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Ajuste específico para o estado secundário no modo escuro */
+:global(.button.secondary) {
+  background-color: var(--white);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+}
+
+:global(.button.secondary:hover) {
+  background-color: var(--input-bg);
+}
+
+/* Breakpoint maior (600px) para garantir que a mudança ocorra antes do limite mínimo */
+@media (max-width: 600px) {
+  .categoryNav {
+    flex-direction: column !important;
+    overflow-x: visible !important;
+    padding: 0 !important;
+    gap: 0.5rem !important;
+    display: flex !important;
+  }
+  
+  .categoryNav button {
+    width: 100% !important;
+    text-align: center !important;
+    white-space: normal !important;
+    min-width: 100% !important;
+  }
+}
+
+.resultsInfo {
+  margin-bottom: 1rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.searchContainer {
+  margin-bottom: 2rem;
+  width: 100%;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 1rem 1rem 1rem 3rem;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  font-size: 1rem;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.2s ease;
+  background-color: var(--white);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+}
+
+.searchIcon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
