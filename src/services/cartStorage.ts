@@ -3,26 +3,23 @@ import { Cart } from '../types';
 const CART_KEY = '@vibestore:cart';
 
 /**
- * Carrega os dados do carrinho armazenados localmente no navegador (localStorage).
- * Retorna um carrinho vazio caso não haja dados salvos ou ocorra um erro de processamento.
+ * Salva o carrinho no localStorage.
  */
-export const loadCart = (): Cart => {
-  try {
-    const stored = localStorage.getItem(CART_KEY);
-    return stored ? JSON.parse(stored) : { items: [] };
-  } catch (error) {
-    console.error("Erro ao carregar carrinho local:", error);
-    return { items: [] };
-  }
+export const saveCart = (cart: Cart): void => {
+  localStorage.setItem(CART_KEY, JSON.stringify(cart));
 };
 
 /**
- * Persiste os dados do carrinho no localStorage do navegador.
+ * Carrega o carrinho do localStorage.
  */
-export const saveCart = (cart: Cart): void => {
-  try {
-    localStorage.setItem(CART_KEY, JSON.stringify(cart));
-  } catch (error) {
-    console.error("Erro ao salvar carrinho local:", error);
-  }
+export const loadCart = (): Cart => {
+  const saved = localStorage.getItem(CART_KEY);
+  return saved ? JSON.parse(saved) : { items: [] };
+};
+
+/**
+ * Remove o carrinho do localStorage.
+ */
+export const clearCartStorage = (): void => {
+  localStorage.removeItem(CART_KEY);
 };

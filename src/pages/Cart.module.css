@@ -1,0 +1,342 @@
+.cartPage {
+  padding: 4rem 1.5rem;
+  min-height: 80vh;
+  background-color: var(--background);
+}
+
+.pageTitle {
+  font-size: 3rem;
+  font-weight: 900;
+  color: var(--secondary);
+  margin-bottom: 0;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: -1.5px;
+}
+
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 4rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1rem;
+}
+
+.clearCartBtn {
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid transparent;
+  transition: var(--transition);
+}
+
+.clearCartBtn:hover {
+  color: var(--error);
+  border-color: var(--error);
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 4rem;
+  align-items: flex-start;
+}
+
+.itemsList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.item {
+  background-color: var(--background);
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+  border-bottom: 2px solid var(--secondary);
+}
+
+.itemImage {
+  width: 140px;
+  height: 140px;
+  flex-shrink: 0;
+  background-color: var(--surface);
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.itemImage img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.itemInfo {
+  flex: 1;
+}
+
+.itemTitle {
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: var(--secondary);
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+}
+
+.itemPrice {
+  color: var(--primary);
+  font-weight: 900;
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+}
+
+.quantity {
+  display: flex;
+  align-items: center;
+  border: 2px solid var(--secondary);
+  padding: 0;
+}
+
+.quantity button {
+  background: white;
+  color: var(--secondary);
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+  font-size: 1.2rem;
+}
+
+.quantity button:hover {
+  background-color: var(--secondary);
+  color: white;
+}
+
+.quantity span {
+  width: 50px;
+  text-align: center;
+  font-weight: 900;
+  font-size: 1rem;
+  color: var(--secondary);
+}
+
+.removeBtn {
+  background: var(--surface);
+  color: var(--secondary);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+  border: 1px solid var(--border);
+}
+
+.removeBtn:hover {
+  background-color: var(--secondary);
+  color: white;
+  border-color: var(--secondary);
+}
+
+.itemSubtotal {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--secondary);
+  width: 150px;
+  text-align: right;
+}
+
+/* Summary Card */
+.summaryCard {
+  background-color: var(--secondary);
+  color: white;
+  padding: 3rem;
+  box-shadow: var(--shadow-lg);
+  position: sticky;
+  top: 120px;
+}
+
+.summaryCard h3 {
+  font-size: 1.5rem;
+  font-weight: 900;
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.summaryLine {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  color: #CCCCCC;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+}
+
+.free {
+  color: var(--primary);
+  font-weight: 900;
+}
+
+.totalLine {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  font-weight: 900;
+  font-size: 2rem;
+}
+
+.checkoutBtn {
+  width: 100%;
+  background-color: white;
+  color: var(--secondary);
+  padding: 1.5rem;
+  font-weight: 900;
+  font-size: 1.1rem;
+  margin: 3rem 0 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.checkoutBtn:hover {
+  background-color: var(--primary);
+  color: white;
+  transform: translateY(-5px);
+}
+
+.continueLink {
+  display: block;
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #999999;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.continueLink:hover {
+  color: white;
+}
+
+/* Empty State */
+.emptyCart {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 70vh;
+  text-align: center;
+  gap: 2rem;
+}
+
+.emptyCart h2 {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: var(--secondary);
+  text-transform: uppercase;
+}
+
+.emptyCart p {
+  color: var(--text-muted);
+  max-width: 450px;
+  font-weight: 500;
+}
+
+.backBtn {
+  background-color: var(--secondary);
+  color: white;
+  padding: 1.25rem 3rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+/* Responsividade Aprimorada */
+@media (max-width: 992px) {
+  .cartPage {
+    padding: 2rem 1rem;
+  }
+  
+  .pageTitle {
+    font-size: 2rem;
+  }
+
+  .headerRow {
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .content {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  .item {
+    flex-direction: column;
+    padding: 1.5rem;
+    gap: 1.5rem;
+    text-align: center;
+  }
+
+  .itemImage {
+    width: 100%;
+    max-width: 200px;
+    height: 200px;
+  }
+
+  .controls {
+    flex-direction: column;
+    gap: 1.5rem;
+    justify-content: center;
+  }
+
+  .itemSubtotal {
+    text-align: center;
+    width: 100%;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .summaryCard {
+    position: static;
+    padding: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .pageTitle {
+    font-size: 1.75rem;
+  }
+  
+  .totalLine {
+    font-size: 1.5rem;
+  }
+}

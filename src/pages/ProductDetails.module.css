@@ -1,132 +1,208 @@
 .container {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 4rem 2rem;
+  min-height: 90vh;
 }
 
 .backButton {
+  background: none;
+  border: none;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: none;
-  border: none;
   color: var(--text-muted);
-  cursor: pointer;
-  font-weight: 600;
-  margin-bottom: 2rem;
-  padding: 0;
-  transition: color 0.2s ease;
+  font-weight: 900;
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  margin-bottom: 3rem;
+  transition: var(--transition);
 }
 
 .backButton:hover {
-  color: var(--primary-color);
+  color: var(--secondary);
 }
 
 .productWrapper {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 3rem;
-  background-color: var(--white);
-  padding: 3rem;
-  border-radius: 16px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  gap: 6rem;
+  align-items: start;
 }
 
-@media (max-width: 768px) {
-  .productWrapper {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-    padding: 1.5rem;
-  }
+/* Imagem Section */
+.imageSection {
+  background-color: var(--surface);
+  padding: 4rem;
+  border: 1px solid var(--border);
+  position: sticky;
+  top: 140px;
 }
 
 .imageContainer {
+  aspect-ratio: 1/1;
   display: flex;
-  justify-content: center;
   align-items: center;
-  background-color: white;
-  border-radius: 12px;
-  padding: 1rem;
+  justify-content: center;
+  mix-blend-mode: multiply;
 }
 
 .image {
   max-width: 100%;
-  max-height: 400px;
+  max-height: 100%;
   object-fit: contain;
 }
 
-.info {
+/* Info Section */
+.infoSection {
   display: flex;
   flex-direction: column;
 }
 
 .category {
-  font-size: 0.875rem;
+  font-size: 0.7rem;
   text-transform: uppercase;
-  color: var(--primary-color);
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  margin-bottom: 0.5rem;
+  color: var(--primary);
+  font-weight: 900;
+  letter-spacing: 3px;
+  margin-bottom: 1.5rem;
+  display: inline-block;
 }
 
 .title {
-  font-size: 2rem;
-  font-weight: 800;
-  color: var(--text-main);
-  line-height: 1.2;
-  margin-bottom: 1rem;
+  font-size: 3rem;
+  font-weight: 900;
+  color: var(--secondary);
+  line-height: 1;
+  margin-bottom: 1.5rem;
+  text-transform: capitalize;
+  letter-spacing: -1.5px;
 }
 
-@media (max-width: 480px) {
-  .title {
-    font-size: 1.5rem;
-  }
-}
-
-.rating {
+.ratingRow {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
 }
 
 .stars {
-  color: #f59e0b;
   display: flex;
+  gap: 0.2rem;
 }
 
-.count {
-  font-size: 0.875rem;
-  color: var(--text-muted);
+.ratingValue {
+  font-size: 0.85rem;
+  font-weight: 900;
+  color: var(--secondary);
+}
+
+.priceContainer {
+  margin-bottom: 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .price {
   font-size: 2.5rem;
-  font-weight: 800;
-  color: var(--text-main);
-  margin-bottom: 1.5rem;
+  font-weight: 900;
+  color: var(--secondary);
 }
 
-.descriptionTitle {
-  font-size: 1.125rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
+.installments {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  font-weight: 600;
 }
 
 .description {
-  font-size: 1rem;
-  color: var(--text-muted);
-  line-height: 1.6;
-  margin-bottom: 2rem;
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: var(--text);
+  margin-bottom: 4rem;
+  font-weight: 400;
 }
 
 .buyButton {
-  margin-top: auto;
-  padding: 1.25rem;
-  font-size: 1.125rem;
+  background-color: var(--secondary);
+  color: white;
+  padding: 1.5rem;
+  width: 100%;
+  font-weight: 900;
+  font-size: 1rem;
+  letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 3rem;
+  transition: var(--transition);
 }
 
-.status {
-  text-align: center;
-  padding: 5rem 1rem;
+.buyButton:hover {
+  background-color: var(--primary);
+  transform: translateY(-5px);
+}
+
+/* Benefícios */
+.benefits {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+.benefitItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: var(--secondary);
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.benefitItem span {
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* Utils */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 80vh;
+  gap: 2rem;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 2px solid var(--border);
+  border-top-color: var(--secondary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 992px) {
+  .productWrapper {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+  .imageSection {
+    position: static;
+    padding: 2rem;
+  }
+  .title {
+    font-size: 2rem;
+  }
 }

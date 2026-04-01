@@ -1,116 +1,154 @@
-import { Link } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import { Home as HomeIcon, ShoppingCart, User as UserIcon, LogOut, LogIn, Sun, Moon } from 'lucide-react';
+import { useState } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { ShoppingCart, User, Search, LogOut, X, AlertTriangle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
-import { useTheme } from '../contexts/ThemeContext';
+import { useProducts } from '../hooks/useProducts';
 import styles from './Header.module.css';
 
-/**
- * Componente de cabeçalho global da aplicação.
- * Contém a navegação principal, alternância de tema e resumo do carrinho.
- */
 const Header = () => {
-  const { user, profile, logout } = useAuth();
-  const { totalItems } = useCart();
-  const { theme, toggleTheme } = useTheme();
-  const [animateBadge, setAnimateBadge] = useState(false);
-  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const { user, profile, logout, loadingAuth } = useAuth();
+  const { cart } = useCart();
+  const { searchQuery, setSearchQuery } = useProducts();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  /**
-   * Finaliza a sessão do usuário e fecha o modal de confirmação.
-   */
-  const handleLogout = async () => {
-    setShowLogoutConfirm(false);
-    await logout();
+  const isHomePage = location.pathname === '/';
+  const totalItems = cart.items.reduce((acc, item) => acc + item.quantity, 0);
+
+  const handleLogoClick = (e: React.MouseEvent) => {
+    if (isHomePage) {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
-  /**
-   * Dispara uma animação visual no ícone do carrinho quando itens são adicionados.
-   */
-  useEffect(() => {
-    if (totalItems === 0) return;
-    
-    setAnimateBadge(true);
-    const timer = setTimeout(() => setAnimateBadge(false), 300);
-    
-    return () => clearTimeout(timer);
-  }, [totalItems]);
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+    if (!isHomePage) {
+      navigate('/');
+    }
+  };
+
+  const clearSearch = () => {
+    setSearchQuery('');
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    setShowLogoutModal(false);
+    navigate('/');
+  };
 
   return (
-    <header className={styles.header}>
-      {/* Modal de confirmação de logout */}
-      {showLogoutConfirm && (
-        <div className="overlay">
-          <div className="modal">
-            <h3 style={{ marginBottom: '1rem', fontWeight: '800' }}>Deseja sair?</h3>
-            <p style={{ color: 'var(--text-muted)', marginBottom: '2rem', fontSize: '0.9rem' }}>
-              Você precisará entrar novamente para acessar seus pedidos e endereços salvos.
-            </p>
-            <div style={{ display: 'flex', gap: '1rem' }}>
-              <button className="button" style={{ flex: 1 }} onClick={handleLogout}>Sim, Sair</button>
-              <button className="button secondary" style={{ flex: 1 }} onClick={() => setShowLogoutConfirm(false)}>Cancelar</button>
+    <>
+      <header className={styles.header}>
+        <div className={`container ${styles.container}`}>
+          <Link 
+            to="/" 
+            className={styles.logo} 
+            onClick={handleLogoClick}
+          >
+            BEAUTY<span>GLAM</span>
+          </Link>
+
+          <nav className={`${styles.nav} ${!isHomePage ? styles.hideOnMobile : ''}`}>
+            <div className={styles.searchBar}>
+              <Search size={18} />
+              <input 
+                type="text" 
+                placeholder="Buscar maquiagem..." 
+                value={searchQuery}
+                onChange={handleSearchChange}
+              />
+              {searchQuery && (
+                <button onClick={clearSearch} className={styles.clearSearchBtn}>
+                  <X size={16} />
+                </button>
+              )}
+            </div>
+          </nav>
+
+          <div className={styles.actions}>
+            <div className={styles.authWrapper}>
+              {!loadingAuth && (
+                <>
+                  {user ? (
+                    <div className={styles.userSession}>
+                      <Link to="/profile" className={styles.profileLink}>
+                        <User size={18} />
+                        <span className={styles.userName}>
+                          {profile?.displayName?.split(' ')[0] || user.email?.split('@')[0]}
+                        </span>
+                      </Link>
+                      <div className={styles.dividerVertical} />
+                      <button 
+                        onClick={() => setShowLogoutModal(true)} 
+                        className={styles.logoutBtn} 
+                        title="Sair"
+                      >
+                        <LogOut size={18} />
+                      </button>
+                    </div>
+                  ) : (
+                    <Link to="/login" className={styles.loginBtn}>
+                      Login
+                    </Link>
+                  )}
+                </>
+              )}
+            </div>
+
+            <Link to="/cart" className={styles.cartButton}>
+              <ShoppingCart size={22} />
+              <AnimatePresence mode="wait">
+                {totalItems > 0 && (
+                  <motion.span 
+                    key={totalItems}
+                    className={styles.badge}
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 1.5, opacity: 0 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                  >
+                    {totalItems}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      {/* Modal de Confirmação de Logout */}
+      {showLogoutModal && (
+        <div className={styles.modalOverlay} onClick={() => setShowLogoutModal(false)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <AlertTriangle size={24} color="var(--primary)" />
+              <h2>Confirmar Saída</h2>
+            </div>
+            <p>Você tem certeza que deseja encerrar sua sessão na BeautyGlam?</p>
+            <div className={styles.modalActions}>
+              <button 
+                className={styles.cancelBtn} 
+                onClick={() => setShowLogoutModal(false)}
+              >
+                Continuar Comprando
+              </button>
+              <button 
+                className={styles.confirmBtn} 
+                onClick={handleLogout}
+              >
+                Sair da Conta
+              </button>
             </div>
           </div>
         </div>
       )}
-
-      <Link to="/" className={styles.logoLink} aria-label="Ir para Home">
-        <h1 className={styles.logo}>
-          VIBE<span>STORE</span>
-        </h1>
-      </Link>
-
-      <nav className={styles.nav}>
-        <button 
-          onClick={toggleTheme} 
-          className={styles.themeBtn} 
-          title={theme === 'light' ? 'Modo Escuro' : 'Modo Claro'}
-          aria-label="Alternar Tema"
-        >
-          {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
-        </button>
-
-        <Link to="/" className={styles.link} title="Home" aria-label="Home">
-          <HomeIcon size={20} />
-          <span className={styles.hideMobile}>Home</span>
-        </Link>
-
-        {user && (
-          <Link to="/profile" className={styles.link} title="Minha Conta" aria-label="Minha Conta">
-            <UserIcon size={20} />
-            <span className={styles.hideMobile}>Minha Conta</span>
-          </Link>
-        )}
-
-        <Link to="/cart" className={styles.link} title="Carrinho" aria-label="Carrinho">
-          <div style={{ position: 'relative' }}>
-            <ShoppingCart size={20} />
-            {totalItems > 0 && (
-              <span className={`${styles.badge} ${animateBadge ? styles.badgePop : ''}`}>
-                {totalItems}
-              </span>
-            )}
-          </div>
-          <span className={styles.hideMobile}>Carrinho</span>
-        </Link>
-
-        {user ? (
-          <div className={styles.userSection}>
-            <span className={styles.email}>Olá, {(profile?.displayName || user.email?.split('@')[0] || '').split(' ')[0]}</span>
-            <button onClick={() => setShowLogoutConfirm(true)} className={styles.logoutBtn} title="Sair" aria-label="Sair">
-              <LogOut size={18} />
-              <span className={styles.hideMobile}>Sair</span>
-            </button>
-          </div>
-        ) : (
-          <Link to="/login" className={styles.link} title="Entrar" aria-label="Entrar">
-            <LogIn size={20} />
-            <span>Entrar</span>
-          </Link>
-        )}
-      </nav>
-    </header>
+    </>
   );
 };
 

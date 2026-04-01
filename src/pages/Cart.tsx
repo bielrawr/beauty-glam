@@ -1,132 +1,117 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
-import { useAuth } from '../contexts/AuthContext';
+import { Trash2, Plus, Minus, ArrowLeft, ShoppingBag, Eraser } from 'lucide-react';
+import styles from './Cart.module.css';
 
-/**
- * Utilitário para formatação de moeda em Real Brasileiro (BRL).
- */
-const brl = new Intl.NumberFormat('pt-BR', {
-  style: 'currency',
-  currency: 'BRL',
-});
-
-/**
- * Página do Carrinho de Compras.
- * Permite visualizar itens, alterar quantidades, remover produtos e prosseguir para o checkout.
- */
 export function Cart() {
-  const { cart, totalItems, totalPrice, setQuantity, removeItem, clearCart } =
-    useCart();
-  const { user } = useAuth();
+  const { cart, removeItem, setQuantity, clearCart } = useCart();
   const navigate = useNavigate();
 
-  /**
-   * Gerencia o fluxo de finalização de compra, redirecionando para login se necessário.
-   */
-  const handleCheckout = () => {
-    if (!user) {
-      // Redireciona para o login, preservando o destino final do checkout no estado da navegação
-      navigate('/login', { state: { from: { pathname: '/checkout' } } });
-    } else {
-      navigate('/checkout');
-    }
-  };
+  const total = cart.items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+
+  if (cart.items.length === 0) {
+    return (
+      <div className={`container ${styles.emptyCart}`}>
+        <ShoppingBag size={80} strokeWidth={1} color="var(--secondary)" />
+        <h2>Seu carrinho está vazio</h2>
+        <p>Parece que você ainda não escolheu seus produtos de beleza favoritos.</p>
+        <Link to="/" className={styles.backBtn}>
+          <ArrowLeft size={18} /> Continuar Comprando
+        </Link>
+      </div>
+    );
+  }
 
   return (
-    <main className="container">
-      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
-        <h2 style={{ margin: '10px 0 14px' }}>Carrinho</h2>
-        <Link to="/" style={{ color: 'var(--primary-color)', fontWeight: '600' }}>Voltar para Loja</Link>
+    <div className={`container ${styles.cartPage}`}>
+      <div className={styles.headerRow}>
+        <h1 className={styles.pageTitle}>Seu Carrinho</h1>
+        <button className={styles.clearCartBtn} onClick={clearCart}>
+          <Eraser size={16} /> Esvaziar Carrinho
+        </button>
       </div>
 
-      {cart.items.length === 0 ? (
-        <div className="status">Seu carrinho está vazio.</div>
-      ) : (
-        <>
-          <div className="status" style={{ marginBottom: 14 }}>
-            <strong>{totalItems}</strong> item(ns) —{' '}
-            <strong>{brl.format(totalPrice * 5.2)}</strong>
-          </div>
-
-          {/* Alerta informativo para usuários não logados */}
-          {!user && (
-            <div style={{ backgroundColor: '#eff6ff', padding: '1rem', borderRadius: '8px', marginBottom: '1.5rem', border: '1px solid #bfdbfe', fontSize: '0.9rem', color: '#1e40af' }}>
-              ℹ️ Você está comprando como <strong>visitante</strong>. Para finalizar o pedido, será necessário entrar ou criar uma conta.
-            </div>
-          )}
-
-          <div className="cartList">
-            {cart.items.map((item) => (
-              <div className="cartRow" key={item.productId}>
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  width={54}
-                  height={54}
-                  style={{ objectFit: 'contain' }}
-                />
-
-                <div style={{ minWidth: 0, flex: 1 }}>
-                  <div className="cartTitle" title={item.title}>
-                    {item.title}
+      <div className={styles.content}>
+        <div className={styles.itemsList}>
+          {cart.items.map((item) => (
+            <div key={item.productId} className={styles.item}>
+              <div className={styles.itemImage}>
+                <img src={item.image} alt={item.title} />
+              </div>
+              
+              <div className={styles.itemInfo}>
+                <h3 className={styles.itemTitle}>{item.title}</h3>
+                <p className={styles.itemPrice}>R$ {item.price.toFixed(2)}</p>
+                
+                <div className={styles.controls}>
+                  <div className={styles.quantity}>
+                    <button 
+                      type="button"
+                      onClick={() => setQuantity(item.productId, item.quantity - 1)}
+                      title="Diminuir quantidade"
+                    >
+                      <Minus size={16} />
+                    </button>
+                    <span>{item.quantity}</span>
+                    <button 
+                      type="button"
+                      onClick={() => setQuantity(item.productId, item.quantity + 1)}
+                      title="Aumentar quantidade"
+                    >
+                      <Plus size={16} />
+                    </button>
                   </div>
-                  <div style={{ 
-                    fontSize: '0.8rem', 
-                    color: 'var(--text-muted)', 
-                    marginBottom: '4px',
-                    display: '-webkit-box',
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical',
-                    overflow: 'hidden',
-                    lineHeight: '1.2'
-                  }}>
-                    {item.description}
-                  </div>
-                  <div style={{ fontWeight: '700', color: 'var(--primary-color)' }}>{brl.format(item.price * 5.2)}</div>
-                </div>
-
-                <div className="cartActions">
-                  <button
-                    className="iconButton"
-                    onClick={() =>
-                      setQuantity(item.productId, Math.max(0, item.quantity - 1))
-                    }
-                    aria-label="Diminuir"
-                  >
-                    -
-                  </button>
-                  <span style={{ width: 28, textAlign: 'center' }}>
-                    {item.quantity}
-                  </span>
-                  <button
-                    className="iconButton"
-                    onClick={() => setQuantity(item.productId, item.quantity + 1)}
-                    aria-label="Aumentar"
-                  >
-                    +
-                  </button>
-
-                  <button
-                    className="linkDanger"
+                  
+                  <button 
+                    type="button"
+                    className={styles.removeBtn}
                     onClick={() => removeItem(item.productId)}
+                    title="Remover item"
                   >
-                    remover
+                    <Trash2 size={18} />
                   </button>
                 </div>
               </div>
-            ))}
-          </div>
+              
+              <div className={styles.itemSubtotal}>
+                R$ {(item.price * item.quantity).toFixed(2)}
+              </div>
+            </div>
+          ))}
+        </div>
 
-          <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem', flexWrap: 'wrap' }}>
-            <button className="button" style={{ flex: 1, minWidth: '200px' }} onClick={handleCheckout}>
-              {user ? 'Ir para o Pagamento' : 'Entrar para Finalizar'}
+        <aside className={styles.summary}>
+          <div className={styles.summaryCard}>
+            <h3>Resumo do Pedido</h3>
+            
+            <div className={styles.summaryLine}>
+              <span>Subtotal</span>
+              <span>R$ {total.toFixed(2)}</span>
+            </div>
+            
+            <div className={styles.summaryLine}>
+              <span>Frete</span>
+              <span className={styles.free}>Grátis</span>
+            </div>
+            
+            <div className={`${styles.summaryLine} ${styles.totalLine}`}>
+              <span>Total</span>
+              <span>R$ {total.toFixed(2)}</span>
+            </div>
+            
+            <button 
+              className={styles.checkoutBtn}
+              onClick={() => navigate('/checkout')}
+            >
+              Finalizar Compra
             </button>
-            <button className="button secondary" onClick={clearCart}>
-              Limpar carrinho
-            </button>
+            
+            <Link to="/" className={styles.continueLink}>
+              Continuar Comprando
+            </Link>
           </div>
-        </>
-      )}
-    </main>
+        </aside>
+      </div>
+    </div>
   );
 }

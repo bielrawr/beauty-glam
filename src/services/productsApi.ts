@@ -1,67 +1,65 @@
 import { Product } from '../types';
 
-/**
- * Serviço responsável por centralizar as chamadas à API da FakeStore.
- * Isolar as requisições HTTP facilita a manutenção, troca de API e testes automatizados.
- */
-const BASE_URL = 'https://fakestoreapi.com';
+const BASE_URL = 'https://makeup-api.herokuapp.com/api/v1';
 
 /**
- * Obtém a lista completa de produtos disponíveis na API.
+ * Serviço responsável por buscar produtos da marca Maybelline.
  */
 export const getProducts = async (): Promise<Product[]> => {
   try {
-    const response = await fetch(`${BASE_URL}/products`);
+    const response = await fetch(`${BASE_URL}/products.json?brand=maybelline`);
     
-    if (!response.ok) {
-      throw new Error(`Erro na requisição: ${response.status}`);
-    }
+    if (!response.ok) throw new Error(`Erro na requisição: ${response.status}`);
     
-    return await response.json();
+    const data = await response.json();
+    
+    return data.map((item: any) => ({
+      id: item.id,
+      title: item.name,
+      price: parseFloat(item.price) || 10.0,
+      description: item.description || "Sem descrição disponível.",
+      category: item.category || item.product_type,
+      image: item.api_featured_image || item.image_link,
+      rating: {
+        rate: parseFloat(item.rating) || 0,
+        count: 0
+      }
+    }));
   } catch (error) {
-    console.error("Erro ao buscar produtos:", error);
+    console.error("Erro ao buscar produtos da Makeup API:", error);
     throw error;
   }
 };
 
-/**
- * Obtém a lista de categorias de produtos disponíveis.
- */
-export const getCategories = async (): Promise<string[]> => {
-  try {
-    const response = await fetch(`${BASE_URL}/products/categories`);
-    if (!response.ok) throw new Error("Erro ao buscar categorias");
-    return await response.json();
-  } catch (error) {
-    console.error("Erro ao buscar categorias:", error);
-    throw error;
-  }
-};
-
-/**
- * Filtra os produtos por uma categoria específica.
- */
-export const getProductsByCategory = async (category: string) => {
-  try {
-    const response = await fetch(`${BASE_URL}/products/category/${category}`);
-    if (!response.ok) throw new Error("Erro ao buscar produtos por categoria");
-    return await response.json();
-  } catch (error) {
-    console.error("Erro ao buscar produtos por categoria:", error);
-    throw error;
-  }
-};
-
-/**
- * Busca os detalhes de um produto individual através do seu ID único.
- */
 export const getProductById = async (id: number | string) => {
   try {
-    const response = await fetch(`${BASE_URL}/products/${id}`);
+    const response = await fetch(`${BASE_URL}/products/${id}.json`);
     if (!response.ok) throw new Error("Erro ao buscar produto");
-    return await response.json();
+    const item = await response.json();
+    
+    return {
+      id: item.id,
+      title: item.name,
+      price: parseFloat(item.price) || 10.0,
+      description: item.description || "Sem descrição disponível.",
+      category: item.category || item.product_type,
+      image: item.api_featured_image || item.image_link,
+      rating: {
+        rate: parseFloat(item.rating) || 0,
+        count: 0
+      }
+    };
   } catch (error) {
     console.error(`Erro ao buscar produto ${id}:`, error);
     throw error;
   }
+};
+
+export const getCategories = async (): Promise<string[]> => {
+  return ["Eyeliner", "Lipstick", "Mascara", "Foundation"];
+};
+
+export const getProductsByCategory = async (category: string) => {
+  const all = await getProducts();
+  return all.filter(p => p.category.toLowerCase() === category.toLowerCase());
 };

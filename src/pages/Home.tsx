@@ -1,160 +1,183 @@
-import { useState, useEffect } from 'react';
-import { Search } from 'lucide-react';
-import ProductGrid from '../components/ProductGrid';
+import { useState, useMemo, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
 import { useProducts } from '../hooks/useProducts';
-import { getCategories } from '../services/productsApi';
-import { categoryTranslations } from '../utils/productTranslations';
+import ProductCard from '../components/ProductCard';
 import styles from './Home.module.css';
-import { Product } from '../types';
+import { Sparkles, ArrowRight, SearchX } from 'lucide-react';
 
-/**
- * Página Inicial (Home).
- * Exibe o banner principal, filtros de categoria, barra de busca e o grid de produtos.
- */
 export function Home() {
-  const { products: allProducts, loading, error } = useProducts();
-  const [categories, setCategories] = useState<string[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const { products, loading, error, searchQuery } = useProducts();
+  const [activeCategory, setActiveCategory] = useState('Tudo');
+  const productsSectionRef = useRef<HTMLElement>(null);
 
   /**
-   * Carrega as categorias disponíveis ao montar o componente.
+   * Função ultra-robusta para normalizar texto (remove acentos, cedilhas e espaços extras)
    */
-  useEffect(() => {
-    const fetchCats = async () => {
-      try {
-        const data = await getCategories();
-        setCategories(data);
-      } catch (err) {
-        console.error("Erro ao carregar categorias:", err);
-      }
-    };
-    fetchCats();
-  }, []);
+  const normalize = (text: string) => {
+    if (!text) return "";
+    return text
+      .toLowerCase()
+      .trim()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, "") // Remove acentos
+      .replace(/ç/g, "c"); // Garante o 'c' no lugar do 'ç'
+  };
 
-  /**
-   * Aplica os filtros de categoria e termo de busca sempre que houver mudanças.
-   */
-  useEffect(() => {
-    let result = allProducts;
+  const scrollToProducts = () => {
+    if (productsSectionRef.current) {
+      const offset = 100;
+      const bodyRect = document.body.getBoundingClientRect().top;
+      const elementRect = productsSectionRef.current.getBoundingClientRect().top;
+      const elementPosition = elementRect - bodyRect;
+      const offsetPosition = elementPosition - offset;
 
-    // 1. Filtro de Categoria: Considera tanto a tradução quanto o termo original da API
-    if (selectedCategory !== 'all') {
-      result = result.filter(p => 
-        p.category === categoryTranslations[selectedCategory] || p.category === selectedCategory
-      );
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
     }
+  };
 
-    // 2. Filtro de Busca por Texto (Case-insensitive)
-    if (searchTerm.trim() !== '') {
-      const term = searchTerm.toLowerCase();
-      result = result.filter(p => 
-        p.title.toLowerCase().includes(term) || 
-        p.description.toLowerCase().includes(term)
-      );
+  useEffect(() => {
+    if (searchQuery.trim().length > 0) {
+      scrollToProducts();
     }
+  }, [searchQuery]);
 
-    setFilteredProducts(result);
-  }, [selectedCategory, searchTerm, allProducts]);
+  const categories = useMemo(() => {
+    const cats = Array.from(new Set(products.map(p => p.category))).sort();
+    return ['Tudo', ...cats];
+  }, [products]);
 
-  /**
-   * Utilitário para exibir o nome amigável da categoria traduzida.
-   */
-  const getTranslatedCategory = (cat: string) => categoryTranslations[cat] || cat;
+  // Lógica de filtragem aprimorada
+  const filteredProducts = useMemo(() => {
+    const query = normalize(searchQuery);
+    
+    return products.filter(p => {
+      // 1. Verifica categoria
+      const matchesCategory = activeCategory === 'Tudo' || p.category === activeCategory;
+      
+      // 2. Se não houver busca, retorna apenas o filtro de categoria
+      if (!query) return matchesCategory;
 
-  /**
-   * Exibe uma tela de loading estilizada somente no carregamento inicial da lista de produtos.
-   */
-  if (loading && allProducts.length === 0) {
+      // 3. Normaliza campos do produto para comparação
+      const title = normalize(p.title);
+      const desc = normalize(p.description);
+      const cat = normalize(p.category);
+
+      // 4. Verifica se o termo existe em qualquer parte relevante
+      const matchesSearch = title.includes(query) || 
+                            desc.includes(query) || 
+                            cat.includes(query);
+      
+      return matchesCategory && matchesSearch;
+    });
+  }, [products, activeCategory, searchQuery]);
+
+  if (loading) {
     return (
-      <div style={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'center', 
-        justifyContent: 'center', 
-        height: '80vh',
-        gap: '1rem' 
-      }}>
-        <h1 className="animate-pulse" style={{ fontSize: '2.5rem', fontWeight: '800', color: 'var(--primary-color)' }}>
-          VIBE<span style={{ color: 'var(--text-main)' }}>STORE</span>
-        </h1>
-        <div className="animate-spin" style={{ width: '30px', height: '30px', border: '3px solid #e2e8f0', borderTopColor: 'var(--primary-color)', borderRadius: '50%' }}></div>
+      <div className={styles.loading}>
+        <div className={styles.spinner}></div>
+        <p>CARREGANDO COLEÇÃO DE LUXO...</p>
       </div>
     );
   }
 
+  if (error) {
+    return <div className={styles.error}>{error}</div>;
+  }
+
   return (
-    <main className="container">
+    <div className={styles.home}>
+      {/* Hero Section Editorial */}
       <section className={styles.hero}>
-        <h2>Descubra sua Vibe</h2>
-        <p>
-          Explore nossa curadoria de produtos exclusivos, desde tecnologia de ponta até moda atemporal.
-        </p>
-      </section>
-
-      {/* Barra de Busca em Tempo Real */}
-      <div className={styles.searchContainer}>
-        <Search className={styles.searchIcon} size={20} />
-        <input 
-          type="text"
-          className={styles.searchInput}
-          placeholder="O que você está procurando hoje?"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+        <motion.div 
+          className={styles.abstractBar1}
+          animate={{ x: [-10, 10, -10] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
         />
-      </div>
+        
+        <motion.div 
+          className={styles.abstractCircle1}
+          animate={{ scale: [1, 1.1, 1], opacity: [0.1, 0.2, 0.1] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+        />
 
-      {/* Navegação de Categorias */}
-      <nav className={styles.categoryNav}>
-        <button 
-          onClick={() => setSelectedCategory('all')}
-          className={`button ${selectedCategory === 'all' ? '' : 'secondary'}`}
-        >
-          Todos os Produtos
-        </button>
-        {categories.map(cat => (
-          <button 
-            key={cat}
-            onClick={() => setSelectedCategory(cat)}
-            className={`button ${selectedCategory === cat ? '' : 'secondary'}`}
+        <div className={`container ${styles.heroContainer}`}>
+          <motion.div 
+            className={styles.heroContent}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
           >
-            {getTranslatedCategory(cat)}
-          </button>
-        ))}
-      </nav>
-
-      {error && (
-        <div style={{ textAlign: 'center', padding: '4rem', color: '#dc2626' }}>
-          <p>{error}</p>
-        </div>
-      )}
-
-      {!loading && !error && (
-        <>
-          {/* Informações sobre os resultados filtrados */}
-          <div className={styles.resultsInfo}>
-            {searchTerm.trim() !== '' ? (
-              <>Resultados para "<strong>{searchTerm}</strong>": </>
-            ) : (
-              <>Exibindo <strong>{filteredProducts.length}</strong> produtos</>
-            )}
-            {selectedCategory !== 'all' && <> em <strong>{getTranslatedCategory(selectedCategory)}</strong></>}
-          </div>
-          
-          {/* Fallback para resultados vazios */}
-          {filteredProducts.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '5rem 1rem', color: 'var(--text-muted)' }}>
-              <p style={{ fontSize: '1.2rem' }}>Nenhum produto encontrado para sua busca.</p>
-              <button className="linkDanger" style={{ marginTop: '1rem', textDecoration: 'underline' }} onClick={() => { setSearchTerm(''); setSelectedCategory('all'); }}>
-                Limpar todos os filtros
+            <span className={styles.badge}>
+              <Sparkles size={14} /> Coleção Exclusiva
+            </span>
+            <h1 className={styles.heroTitle}>
+              Beleza <span>Redefinida</span>
+            </h1>
+            <p className={styles.heroDescription}>
+              Produtos de alta performance com acabamento profissional para realçar o que há de melhor em você.
+            </p>
+            <div className={styles.heroActions}>
+              <button onClick={scrollToProducts} className={styles.primaryBtn}>
+                Comprar Agora <ArrowRight size={18} />
+              </button>
+              <button onClick={scrollToProducts} className={styles.secondaryBtn}>
+                Ver Coleção
               </button>
             </div>
+          </motion.div>
+          
+          <motion.div 
+            className={styles.heroImage}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1 }}
+          >
+            <div className={styles.imageFrame}>
+              <img src="/src/assets/hero.png" alt="Beauty Model Luxe" />
+              <div className={styles.goldLine} />
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Products Section */}
+      <section ref={productsSectionRef} className={styles.productsSection}>
+        <div className="container">
+          <div className={styles.sectionHeader}>
+            <h2 className={styles.sectionTitle}>
+              {searchQuery ? `Resultados para "${searchQuery}"` : 'Tendências de Beleza'}
+            </h2>
+            <div className={styles.filterBar}>
+              {categories.map((cat) => (
+                <button 
+                  key={cat}
+                  className={`${styles.filterBtn} ${activeCategory === cat ? styles.filterBtnActive : ''}`}
+                  onClick={() => setActiveCategory(cat)}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {filteredProducts.length > 0 ? (
+            <div className={styles.grid}>
+              {filteredProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
           ) : (
-            <ProductGrid products={filteredProducts} />
+            <div className={styles.noResults}>
+              <SearchX size={60} strokeWidth={1} color="#CCCCCC" />
+              <h3>Nenhum produto encontrado</h3>
+              <p>Tente ajustar sua busca ou mudar de categoria.</p>
+            </div>
           )}
-        </>
-      )}
-    </main>
+        </div>
+      </section>
+    </div>
   );
 }

@@ -1,53 +1,66 @@
 import { Link } from 'react-router-dom';
-import { useCart } from '../contexts/CartContext';
+import { motion } from 'framer-motion';
+import { ShoppingBag, Star } from 'lucide-react';
 import { Product } from '../types';
+import { useCart } from '../contexts/CartContext';
 import styles from './ProductCard.module.css';
 
 interface ProductCardProps {
   product: Product;
 }
 
-/**
- * Componente de cartão para exibição resumida de um produto.
- * Apresenta imagem, título, preço formatado e botão de compra rápida.
- */
 const ProductCard = ({ product }: ProductCardProps) => {
-  const { title, price, image, id } = product;
   const { addItem } = useCart();
 
-  /**
-   * Formata o preço de USD para BRL (usando uma cotação estática de 5.2 para fins de demonstração).
-   */
-  const formattedPrice = new Intl.NumberFormat('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-  }).format(price * 5.2);
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addItem(product);
+  };
+
+  const isNew = product.id % 8 === 0;
 
   return (
-    <article className={styles.card}>
-      <Link to={`/product/${id}`} className={styles.linkWrapper}>
+    <motion.div 
+      className={styles.card}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      <Link to={`/product/${product.id}`} className={styles.link}>
         <div className={styles.imageContainer}>
-          <img src={image} alt={title} className={styles.image} />
-        </div>
+          {isNew && <span className={styles.badge}>NEW</span>}
+          
+          <img src={product.image} alt={product.title} className={styles.image} />
+          
+          {product.rating && product.rating.rate > 0 && (
+            <div className={styles.rating}>
+              <Star size={10} fill="var(--accent)" color="var(--accent)" />
+              <span>{product.rating.rate}</span>
+            </div>
+          )}
 
-        <div className={styles.info}>
-          <h3 className={styles.title} title={title}>
-            {title}
-          </h3>
-          <p className={styles.price}>{formattedPrice}</p>
+          <button 
+            type="button"
+            className={styles.quickAdd} 
+            onClick={handleAddToCart}
+          >
+            <ShoppingBag size={14} />
+            ADICIONAR AO CARRINHO
+          </button>
+        </div>
+        
+        <div className={styles.content}>
+          <span className={styles.category}>{product.category}</span>
+          <h3 className={styles.title}>{product.title.toLowerCase()}</h3>
+          
+          <div className={styles.priceContainer}>
+            <span className={styles.currency}>R$</span>
+            <span className={styles.price}>{product.price.toFixed(2)}</span>
+          </div>
         </div>
       </Link>
-
-      <button 
-        className={styles.button} 
-        onClick={(e) => {
-          e.preventDefault(); // Impede a navegação para a página de detalhes ao clicar no botão
-          addItem(product);
-        }}
-      >
-        Adicionar ao Carrinho
-      </button>
-    </article>
+    </motion.div>
   );
 };
 
