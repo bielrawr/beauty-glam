@@ -35,7 +35,6 @@ Bem-vindo à **BEAUTYGLAM**, uma aplicação de e-commerce moderna desenvolvida 
 - **Histórico de Pedidos**: Visualização detalhada de compras realizadas, com status e data.
 
 ### 🛍️ Experiência de Compra (UX)
-- **Localização de Luxo**: Títulos, categorias e descrições dos produtos traduzidos manualmente para **Português (PT-BR)** com foco em nexo gramatical.
 - **Design Editorial**: Interface inspirada em revistas de moda de luxo, com alto contraste e minimalismo.
 - **Motor de Busca Inteligente**: Filtro em tempo real com normalização de acentos e scroll automático.
 - **Design Mobile-First**: Cabeçalho adaptável que prioriza espaço e usabilidade em telas menores.
