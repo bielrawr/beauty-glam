@@ -1,6 +1,6 @@
 /**
- * Motor de Localização BeautyGlam
- * Mantemos as descrições originais para preservar a integridade técnica.
+ * Motor de Localização BeautyGlam (Otimizado)
+ * Traduzimos apenas Títulos e Categorias para manter a fluidez e integridade técnica.
  */
 
 const categoryMap: Record<string, string> = {
@@ -11,18 +11,20 @@ const categoryMap: Record<string, string> = {
   "bronzer": "Bronzeador",
   "blush": "Blush",
   "concealer": "Corretivo",
-  "powder": "Pó",
+  "powder": "Pó Compacto",
   "eyeshadow": "Sombra",
-  "eyebrow": "Sobrancelha"
+  "eyebrow": "Sobrancelha",
+  "liquid": "Líquido",
+  "matte": "Matte"
 };
 
 /**
- * Traduz apenas o essencial (título e categoria) e preserva a descrição original.
+ * Traduz apenas o essencial para a vitrine e preserva a descrição original da API.
  */
 export const translateProduct = (product: any) => {
   if (!product) return product;
 
-  // Tradução simples do título para termos comuns, se necessário
+  // Tradução simples do título
   let translatedTitle = product.title;
   Object.entries(categoryMap).forEach(([eng, pt]) => {
     const regex = new RegExp(`\\b${eng}\\b`, 'gi');
@@ -32,7 +34,7 @@ export const translateProduct = (product: any) => {
   return {
     ...product,
     title: translatedTitle,
-    description: product.description, // Voltando para a descrição original sem tradução
+    description: product.description, // Mantido original conforme solicitado
     category: categoryMap[product.category?.toLowerCase()] || product.category || "Maquiagem"
   };
 };

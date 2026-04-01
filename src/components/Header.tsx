@@ -4,7 +4,7 @@ import { ShoppingCart, User, Search, LogOut, X, AlertTriangle } from 'lucide-rea
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
-import { useProducts } from '../hooks/useProducts';
+import { useProducts } from '../contexts/ProductContext';
 import styles from './Header.module.css';
 
 const Header = () => {

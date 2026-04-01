@@ -1,10 +1,13 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useProducts } from '../hooks/useProducts';
+import { useProducts } from '../contexts/ProductContext';
 import ProductCard from '../components/ProductCard';
 import styles from './Home.module.css';
 import { Sparkles, ArrowRight, SearchX } from 'lucide-react';
 
+/**
+ * Assets oficiais para o slide da Hero Section.
+ */
 const HERO_IMAGES = [
   "/src/assets/hero-editorial.jpg",
   "/src/assets/hero-2.jpg",
@@ -13,13 +16,19 @@ const HERO_IMAGES = [
   "/src/assets/hero-5.jpg"
 ];
 
+/**
+ * Página Inicial (Home): Ponto de entrada principal da loja.
+ * Apresenta o banner editorial e a vitrine interativa de produtos.
+ */
 export function Home() {
   const { products, loading, error, searchQuery } = useProducts();
   const [activeCategory, setActiveCategory] = useState('Tudo');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const productsSectionRef = useRef<HTMLElement>(null);
 
-  // Lógica do Slide Automático (MUITO LENTO: 15 segundos)
+  /**
+   * Lógica do Slide Automático: Rotaciona as imagens a cada 15 segundos.
+   */
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % HERO_IMAGES.length);
@@ -27,11 +36,17 @@ export function Home() {
     return () => clearInterval(timer);
   }, []);
 
+  /**
+   * Normalização de texto: Remove acentos e padroniza para buscas precisas.
+   */
   const normalize = (text: string) => {
     if (!text) return "";
     return text.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, "").replace(/ç/g, "c");
   };
 
+  /**
+   * Scroll Suave: Leva o usuário para a seção de produtos.
+   */
   const scrollToProducts = () => {
     if (productsSectionRef.current) {
       const offset = 100;
@@ -41,15 +56,24 @@ export function Home() {
     }
   };
 
+  /**
+   * Dispara o scroll automático sempre que uma busca é iniciada.
+   */
   useEffect(() => {
     if (searchQuery.trim().length > 0) scrollToProducts();
   }, [searchQuery]);
 
+  /**
+   * Extração dinâmica de categorias únicas presentes nos produtos carregados.
+   */
   const categories = useMemo(() => {
     const cats = Array.from(new Set(products.map(p => p.category))).sort();
     return ['Tudo', ...cats];
   }, [products]);
 
+  /**
+   * Motor de filtragem: Combina categoria ativa + termo de busca normalizado.
+   */
   const filteredProducts = useMemo(() => {
     const query = normalize(searchQuery);
     return products.filter(p => {
@@ -62,6 +86,9 @@ export function Home() {
     });
   }, [products, activeCategory, searchQuery]);
 
+  /**
+   * Renderização do Loader Temático (BeautyGlam Luxe).
+   */
   if (loading) {
     return (
       <div className={styles.luxuryLoader}>
@@ -84,6 +111,7 @@ export function Home() {
 
   return (
     <div className={styles.home}>
+      {/* Hero Section Editorial: Slide de imagens com animações suaves */}
       <section className={styles.hero}>
         <motion.div className={styles.abstractBar1} animate={{ x: [-10, 10, -10] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }} />
         <motion.div className={styles.abstractCircle1} animate={{ scale: [1, 1.1, 1], opacity: [0.1, 0.2, 0.1] }} transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }} />
@@ -125,6 +153,7 @@ export function Home() {
         </div>
       </section>
 
+      {/* Vitrine de Produtos: Grade interativa com filtros dinâmicos */}
       <section ref={productsSectionRef} className={styles.productsSection}>
         <div className="container">
           <div className={styles.sectionHeader}>
@@ -142,6 +171,7 @@ export function Home() {
             </div>
           </div>
 
+          {/* Listagem de produtos filtrados ou estado vazio */}
           {filteredProducts.length > 0 ? (
             <div className={styles.grid}>
               {filteredProducts.map((product) => <ProductCard key={product.id} product={product} />)}

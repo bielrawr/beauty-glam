@@ -18,10 +18,13 @@ import { createUserProfile, getUserProfile, getUserByEmail, deleteUserProfile } 
 import { UserProfile } from '../types';
 import { generateCustomerId } from '../utils/validators';
 
+/**
+ * Definição do formato do contexto de autenticação.
+ */
 interface AuthContextType {
-  user: User | null;
-  profile: UserProfile | null;
-  loadingAuth: boolean;
+  user: User | null;               // Objeto de usuário nativo do Firebase
+  profile: UserProfile | null;     // Perfil customizado do Firestore
+  loadingAuth: boolean;            // Indica se a validação inicial do Firebase está ocorrendo
   register: (email: string, password: string, displayName?: string) => Promise<UserCredential>;
   login: (email: string, password: string) => Promise<UserCredential>;
   loginWithGoogle: () => Promise<UserCredential>;
@@ -36,10 +39,14 @@ const AuthContext = createContext<AuthContextType | null>(null);
 const googleProvider = new GoogleAuthProvider();
 const PROFILE_CACHE_KEY = '@beautyglam:user_profile_v2';
 
+/**
+ * AuthProvider: Gerencia o estado global de autenticação e perfil do usuário.
+ * Implementa cache local para carregamento instantâneo do nome do usuário no Header.
+ */
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   
-  // 1. Tenta carregar o perfil do Cache IMEDIATAMENTE (Síncrono)
+  // Inicialização síncrona do perfil através do localStorage para evitar atrasos na UI
   const [profile, setProfile] = useState<UserProfile | null>(() => {
     try {
       const cached = localStorage.getItem(PROFILE_CACHE_KEY);
@@ -51,13 +58,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   
   const [loadingAuth, setLoadingAuth] = useState(true);
 
+  /**
+   * Busca os dados estendidos do usuário no Firestore e atualiza o cache local.
+   */
   const fetchProfile = async (uid: string) => {
     try {
       const data = await getUserProfile(uid);
       if (data) {
         const userProfile = data as UserProfile;
         setProfile(userProfile);
-        // 2. Salva no cache para o próximo F5
         localStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(userProfile));
       }
     } catch (e) {
@@ -65,6 +74,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  /**
+   * Monitora a mudança de estado de autenticação do Firebase.
+   */
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
@@ -80,6 +92,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => unsub();
   }, []);
 
+  /**
+   * Realiza o cadastro de um novo usuário, criando tanto a conta no Auth quanto o perfil no Firestore.
+   */
   async function register(email: string, password: string, displayName = '') {
     const cred = await createUserWithEmailAndPassword(auth, email, password);
     const newProfile = {
@@ -94,10 +109,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return cred;
   }
 
+  /**
+   * Autentica um usuário existente.
+   */
   async function login(email: string, password: string) {
     return await signInWithEmailAndPassword(auth, email, password);
   }
 
+  /**
+   * Autenticação via Google Popup. Gerencia a criação automática de perfil para novos usuários sociais.
+   */
   async function loginWithGoogle() {
     const cred = await signInWithPopup(auth, googleProvider);
     const existingProfile = await getUserProfile(cred.user.uid);
@@ -119,22 +140,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return cred;
   }
 
+  /**
+   * Finaliza a sessão do usuário e limpa o cache local.
+   */
   async function logout() {
     localStorage.removeItem(PROFILE_CACHE_KEY);
     return signOut(auth);
   }
 
+  /**
+   * Memorização do valor do contexto para otimização de performance.
+   */
   const value = useMemo(() => ({ 
     user, profile, loadingAuth, register, login, loginWithGoogle, logout,
     changePassword: async (p: string) => auth.currentUser ? firebaseUpdatePassword(auth.currentUser, p) : undefined,
     changeEmail: async (e: string) => auth.currentUser ? firebaseUpdateEmail(auth.currentUser, e) : undefined,
     refreshProfile: () => user ? fetchProfile(user.uid) : Promise.resolve(),
-    deleteAccount: async () => { if (auth.currentUser) { await deleteUserProfile(auth.currentUser.uid); await deleteUser(auth.currentUser); } }
+    deleteAccount: async () => { 
+      if (auth.currentUser) { 
+        await deleteUserProfile(auth.currentUser.uid); 
+        await deleteUser(auth.currentUser); 
+      } 
+    }
   }), [user, profile, loadingAuth]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
+/**
+ * Hook para facilitar o acesso às funções de autenticação em qualquer componente.
+ */
 export function useAuth() {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error('useAuth deve ser usado dentro de <AuthProvider />');

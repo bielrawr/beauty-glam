@@ -6,7 +6,7 @@ import { useAuth } from './AuthContext';
 import { Cart, CartItem, Product } from '../types';
 
 /**
- * Interface que define as propriedades e métodos disponíveis no contexto do carrinho.
+ * Interface que define as operações disponíveis no carrinho de compras.
  */
 interface CartContextType {
   cart: Cart;
@@ -21,7 +21,8 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | null>(null);
 
 /**
- * Mescla o carrinho local com o carrinho remoto, mantendo a maior quantidade de itens repetidos.
+ * Lógica de Merge: Combina o carrinho local (offline) com o remoto (cloud).
+ * Em caso de conflito, preserva a maior quantidade de cada item.
  */
 function mergeCarts(localCart: Cart, remoteCart: Cart): Cart {
   const map = new Map<number, CartItem>();
@@ -45,7 +46,7 @@ type CartAction =
   | { type: 'CLEAR' };
 
 /**
- * Reducer para gerenciar as ações de atualização do estado do carrinho.
+ * Reducer centralizado para garantir imutabilidade e rastreabilidade das ações no carrinho.
  */
 function reducer(state: Cart, action: CartAction): Cart {
   switch (action.type) {
@@ -73,7 +74,8 @@ function reducer(state: Cart, action: CartAction): Cart {
 }
 
 /**
- * Provedor do Carrinho que gerencia o estado local, sincronização remota e persistência.
+ * CartProvider: Orquestrador da persistência e sincronização do carrinho.
+ * Lida com o fluxo: LocalStorage -> Firestore -> Merge no Login.
  */
 export function CartProvider({ children }: { children: ReactNode }) {
   const { user, loadingAuth } = useAuth();
@@ -83,12 +85,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const userRef = useRef(user);
   const isSyncing = useRef(false);
 
-  // 1) Sincronização de Login/Logout (Monitorando mudança de usuário)
+  /**
+   * Fluxo de Sincronização de Login/Logout.
+   * Quando o usuário loga, traz os dados do Cloud e mescla com os locais.
+   */
   useEffect(() => {
     if (loadingAuth) return;
 
     const sync = async () => {
-      // LOGIN: Mudou de deslogado para logado, realiza o merge dos carrinhos
+      // LOGIN: Dispara o merge de dados entre local e cloud
       if (user && !userRef.current) {
         isSyncing.current = true;
         try {
@@ -97,12 +102,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
           dispatch({ type: 'HYDRATE', payload: merged });
           await saveRemoteCart(user.uid, merged);
         } catch (e) {
-          console.error("Erro no sync de login:", e);
+          console.error("Erro na sincronização de dados do carrinho:", e);
         } finally {
           isSyncing.current = false;
         }
       } 
-      // LOGOUT: Mudou de logado para deslogado, limpa o carrinho atual
+      // LOGOUT: Limpa o estado atual do carrinho
       else if (!user && userRef.current) {
         dispatch({ type: 'CLEAR' });
       }
@@ -112,17 +117,20 @@ export function CartProvider({ children }: { children: ReactNode }) {
     sync();
   }, [user, loadingAuth]);
 
-  // 2) Persistência (Local e Remota) disparada por mudanças no estado do carrinho
+  /**
+   * Persistência disparada por qualquer mudança no estado do carrinho.
+   * Salva localmente e envia para o Cloud (debounce de 800ms).
+   */
   useEffect(() => {
     if (isInitialMount.current) {
       isInitialMount.current = false;
       return;
     }
 
-    // Salva no localStorage sempre
+    // Salva no localStorage (Imediato)
     saveCart(cart);
 
-    // Salva no Firestore se o usuário estiver logado e não houver um sync em andamento
+    // Salva no Firestore (Se logado, com debounce para evitar excesso de requisições)
     if (user && !isSyncing.current) {
       const timer = setTimeout(() => {
         saveRemoteCart(user.uid, cart).catch(console.error);
@@ -131,6 +139,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [cart, user]);
 
+  /**
+   * Valor exportado pelo contexto, contendo o estado e as ações de manipulação.
+   */
   const value = useMemo(() => ({
     cart,
     addItem: (p: Product, q = 1) => dispatch({ type: 'ADD', payload: { product: p, quantity: q } }),
@@ -145,7 +156,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 }
 
 /**
- * Hook personalizado para acessar o contexto do carrinho.
+ * Hook para gerenciar o carrinho de compras de qualquer lugar do app.
  */
 export function useCart() {
   const ctx = useContext(CartContext);
