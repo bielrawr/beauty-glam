@@ -26,7 +26,7 @@ export function OrderSuccess() {
         
         <h2 className={styles.title}>Pedido Recebido!</h2>
         <p className={styles.message}>
-          Obrigado por comprar na <strong>VIBE STORE</strong>. Seu pagamento foi processado e você receberá um e-mail com os detalhes da entrega em breve.
+          Obrigado por comprar na <strong>BEAUTYGLAM</strong>. Seu pagamento foi processado e você receberá um e-mail com os detalhes da entrega em breve.
         </p>
 
         <div className={styles.actions}>

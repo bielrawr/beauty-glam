@@ -18,7 +18,7 @@ const ThemeContext = createContext<ThemeContextType | null>(null);
  */
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>(() => {
-    const stored = localStorage.getItem('@vibestore:theme') as Theme;
+    const stored = localStorage.getItem('@beautyglam:theme') as Theme;
     return stored || 'light';
   });
 
@@ -27,7 +27,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
    */
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('@vibestore:theme', theme);
+    localStorage.setItem('@beautyglam:theme', theme);
   }, [theme]);
 
   /**

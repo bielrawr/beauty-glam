@@ -1,6 +1,6 @@
-# ⚡ VIBE STORE - E-commerce de Alta Performance
+# ✨ BEAUTYGLAM - E-commerce de Maquiagem de Luxo
 
-Bem-vindo à **VIBE STORE**, uma aplicação de e-commerce moderna desenvolvida como parte de um desafio técnico. O projeto utiliza as tecnologias mais recentes do ecossistema React para entregar uma experiência de usuário (UX) fluida, tipada e totalmente responsiva.
+Bem-vindo à **BEAUTYGLAM**, uma aplicação de e-commerce moderna desenvolvida como parte de um desafio técnico. O projeto utiliza as tecnologias mais recentes do ecossistema React para entregar uma experiência de usuário (UX) fluida, tipada e totalmente responsiva, focada no mercado de beleza.
 
 ## 🚀 Tecnologias Utilizadas
 
@@ -11,6 +11,7 @@ Bem-vindo à **VIBE STORE**, uma aplicação de e-commerce moderna desenvolvida 
 - **CSS Modules**: Estilização isolada por componente, evitando conflitos de classes.
 - **Lucide React**: Biblioteca de ícones modernos e leves.
 - **Firebase SDK**: Integração com Autenticação e Firestore.
+- **Framer Motion**: Animações fluidas e transições editoriais.
 
 ### Backend
 - **Node.js + Express**: Servidor dedicado para integração com gateway de pagamento.
@@ -24,7 +25,7 @@ Bem-vindo à **VIBE STORE**, uma aplicação de e-commerce moderna desenvolvida 
 - **Persistência Local**: Itens salvos no `localStorage` são mantidos mesmo após fechar o navegador.
 - **Sincronização Nuvem**: Usuários logados têm seu carrinho sincronizado automaticamente com o **Firestore**.
 - **Merge de Dados**: Ao fazer login, o sistema mescla itens adicionados como visitante com os itens salvos na conta.
-- **Feedback Visual**: Animação "pop" no contador de itens ao adicionar produtos.
+- **Feedback Visual**: Animação de transição suave no contador de itens ao adicionar produtos.
 
 ### 👤 Gestão de Usuário & Perfil
 - **Autenticação Completa**: Login por E-mail/Senha e **Google Sign-In**.
@@ -34,11 +35,10 @@ Bem-vindo à **VIBE STORE**, uma aplicação de e-commerce moderna desenvolvida 
 - **Histórico de Pedidos**: Visualização detalhada de compras realizadas, com status e data.
 
 ### 🛍️ Experiência de Compra (UX)
-- **Localização Total**: Títulos, categorias e descrições dos produtos da Fake Store API traduzidos manualmente para **Português (PT-BR)**.
-- **Preloader Animado**: Identidade visual da marca exibida durante o carregamento inicial.
-- **Design Mobile-First**: Interface totalmente adaptada para celulares, com menus e grades que se ajustam inteligentemente.
-- **Filtro por Categorias**: Navegação simplificada com categorias traduzidas e responsivas.
-- **Detalhes do Produto**: Página dedicada com imagem ampliada e descrição completa.
+- **Localização de Luxo**: Títulos, categorias e descrições dos produtos traduzidos manualmente para **Português (PT-BR)** com foco em nexo gramatical.
+- **Design Editorial**: Interface inspirada em revistas de moda de luxo, com alto contraste e minimalismo.
+- **Motor de Busca Inteligente**: Filtro em tempo real com normalização de acentos e scroll automático.
+- **Design Mobile-First**: Cabeçalho adaptável que prioriza espaço e usabilidade em telas menores.
 
 ---
 
@@ -96,4 +96,3 @@ Para que a autenticação e o banco de dados funcionem, certifique-se de configu
 ---
 
 Desenvolvido por Gabriel Rocha
-# desafio-pd

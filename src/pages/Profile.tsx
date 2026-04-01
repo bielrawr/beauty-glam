@@ -255,15 +255,16 @@ export function Profile() {
           <p>Bem-vindo ao seu painel pessoal, {profile?.displayName?.split(' ')[0] || 'usuário'}.</p>
           {profile?.customerId && (
             <span style={{ 
-              fontSize: '0.8rem', 
-              backgroundColor: '#f1f5f9', 
+              fontSize: '0.7rem', 
+              backgroundColor: 'var(--secondary)', 
               padding: '4px 12px', 
-              borderRadius: '20px', 
-              fontWeight: '700',
-              color: '#64748b',
-              border: '1px solid #e2e8f0'
+              borderRadius: '0', 
+              fontWeight: '900',
+              color: 'white',
+              textTransform: 'uppercase',
+              letterSpacing: '1px'
             }}>
-              ID: {profile.customerId}
+              ID CLIENTE: {profile.customerId.replace('VIBE-', 'BG-')}
             </span>
           )}
         </div>

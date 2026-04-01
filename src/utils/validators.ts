@@ -35,12 +35,12 @@ export const validateAddress = (address: any) => {
 
 /**
  * Gera um ID de cliente único para simulação.
- * Combina o prefixo "VIBE-", 4 caracteres aleatórios e os últimos 4 dígitos do timestamp atual.
+ * Combina o prefixo "BG-", 4 caracteres aleatórios e os últimos 4 dígitos do timestamp atual.
  */
 export const generateCustomerId = (): string => {
   const random = Math.random().toString(36).substring(2, 6).toUpperCase();
   const timestamp = Date.now().toString().slice(-4);
-  return `VIBE-${random}${timestamp}`;
+  return `BG-${random}${timestamp}`;
 };
 
 /**

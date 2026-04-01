@@ -1,6 +1,6 @@
 import { Cart } from '../types';
 
-const CART_KEY = '@vibestore:cart';
+const CART_KEY = '@beautyglam:cart';
 
 /**
  * Salva o carrinho no localStorage.
