@@ -86,7 +86,7 @@ src/
 ├── styles/       # Estilos globais e variáveis
 ├── types/        # Definições de interfaces TypeScript
 └── utils/        # Validadores e tradutores de dados
-```gi
+```
 
 ---
 
@@ -96,3 +96,4 @@ Para que a autenticação e o banco de dados funcionem, certifique-se de configu
 ---
 
 Desenvolvido por Gabriel Rocha
+# desafio-pd
