@@ -46,6 +46,7 @@ const Header = () => {
     <>
       <header className={styles.header}>
         <div className={`container ${styles.container}`}>
+          {/* Logo Sempre à Esquerda */}
           <Link 
             to="/" 
             className={styles.logo} 
@@ -54,50 +55,54 @@ const Header = () => {
             BEAUTY<span>GLAM</span>
           </Link>
 
-          <nav className={`${styles.nav} ${!isHomePage ? styles.hideOnMobile : ''}`}>
-            <div className={styles.searchBar}>
-              <Search size={18} />
-              <input 
-                type="text" 
-                placeholder="Buscar maquiagem..." 
-                value={searchQuery}
-                onChange={handleSearchChange}
-              />
-              {searchQuery && (
-                <button onClick={clearSearch} className={styles.clearSearchBtn}>
-                  <X size={16} />
-                </button>
-              )}
-            </div>
-          </nav>
+          {/* Busca Centralizada (Apenas na Home) */}
+          {isHomePage ? (
+            <nav className={styles.nav}>
+              <div className={styles.searchBar}>
+                <Search size={18} />
+                <input 
+                  type="text" 
+                  placeholder="Buscar maquiagem..." 
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                />
+                {searchQuery && (
+                  <button onClick={clearSearch} className={styles.clearSearchBtn}>
+                    <X size={16} />
+                  </button>
+                )}
+              </div>
+            </nav>
+          ) : (
+            <div className={styles.nav} /> // Espaçador para manter o alinhamento
+          )}
 
+          {/* Ações Sempre à Direita */}
           <div className={styles.actions}>
             <div className={styles.authWrapper}>
-              {!loadingAuth && (
-                <>
-                  {user ? (
-                    <div className={styles.userSession}>
-                      <Link to="/profile" className={styles.profileLink}>
-                        <User size={18} />
-                        <span className={styles.userName}>
-                          {profile?.displayName?.split(' ')[0] || user.email?.split('@')[0]}
-                        </span>
-                      </Link>
-                      <div className={styles.dividerVertical} />
-                      <button 
-                        onClick={() => setShowLogoutModal(true)} 
-                        className={styles.logoutBtn} 
-                        title="Sair"
-                      >
-                        <LogOut size={18} />
-                      </button>
-                    </div>
-                  ) : (
-                    <Link to="/login" className={styles.loginBtn}>
-                      Login
-                    </Link>
-                  )}
-                </>
+              {profile ? (
+                <div className={styles.userSession}>
+                  <Link to="/profile" className={styles.profileLink}>
+                    <User size={18} />
+                    <span className={styles.userName}>
+                      {profile.displayName?.split(' ')[0]}
+                    </span>
+                  </Link>
+                  <div className={styles.dividerVertical} />
+                  <button 
+                    onClick={() => setShowLogoutModal(true)} 
+                    className={styles.logoutBtn} 
+                    title="Sair"
+                  >
+                    <LogOut size={18} />
+                  </button>
+                </div>
+              ) : (
+                !loadingAuth && !user && (
+                  <Link to="/login" className={styles.loginBtn}>
+                    Login
+                  </Link>
+                )
               )}
             </div>
 

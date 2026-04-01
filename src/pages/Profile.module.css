@@ -1,100 +1,85 @@
 .container {
-  max-width: 900px;
+  max-width: 1240px;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 4rem 2rem;
+  background-color: var(--background);
 }
 
 .header {
-  margin-bottom: 2.5rem;
+  margin-bottom: 4rem;
+  padding-bottom: 2rem;
+  border-bottom: 2px solid var(--secondary);
 }
 
 .header h2 {
-  font-size: 2rem;
-  font-weight: 800;
-  color: var(--text-main);
-  letter-spacing: -0.025em;
-  margin-bottom: 0.5rem;
+  font-size: 3rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -1.5px;
+  color: var(--secondary);
+  margin-bottom: 1rem;
 }
 
-.header p {
-  color: var(--text-muted);
-  font-size: 1rem;
-}
-
+/* Tabs: Responsivas com Scroll no Mobile */
 .tabs {
   display: flex;
   gap: 0.5rem;
-  border-bottom: 1px solid var(--border-color);
-  margin-bottom: 2.5rem;
-  overflow-x: auto;
-  scrollbar-width: none;
-  padding-bottom: 2px;
+  margin-bottom: 3rem;
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto; /* Permite scroll se não couber */
+  scrollbar-width: none; /* Esconde scrollbar no Firefox */
+  -ms-overflow-style: none; /* Esconde scrollbar no IE */
 }
 
 .tabs::-webkit-scrollbar {
-  display: none;
+  display: none; /* Esconde scrollbar no Chrome/Safari */
 }
 
 .tabButton {
-  padding: 0.75rem 1.5rem;
-  font-size: 0.95rem;
-  font-weight: 600;
+  background: transparent;
+  padding: 0.75rem 1rem; /* Reduzido de 1rem 1.5rem */
+  font-weight: 900;
+  font-size: 0.65rem; /* Reduzido de 0.75rem */
+  text-transform: uppercase;
+  letter-spacing: 1px;
   color: var(--text-muted);
-  background: none;
-  border: none;
   border-bottom: 2px solid transparent;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
+  transition: var(--transition);
+  white-space: nowrap; /* Impede quebra de linha nas abas */
 }
 
 .tabButtonActive {
-  color: var(--primary-color);
-  border-bottom-color: var(--primary-color);
+  color: var(--secondary);
+  border-bottom-color: var(--secondary);
 }
 
+/* Card Principal */
 .card {
-  background-color: var(--white);
-  padding: 2.5rem;
-  border-radius: 16px;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
-  border: 1px solid var(--border-color);
-}
-
-@media (max-width: 600px) {
-  .card {
-    padding: 1.5rem;
-  }
+  background-color: white;
+  padding: 3rem;
+  border: 1px solid var(--border);
 }
 
 .sectionTitle {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin-bottom: 1.5rem;
-  color: var(--text-main);
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+  font-size: 1.5rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin-bottom: 2.5rem;
+  color: var(--secondary);
 }
 
-/* Grid Layouts */
+/* Formulários Flexíveis */
 .formGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-}
-
-@media (max-width: 600px) {
-  .formGrid {
-    grid-template-columns: 1fr;
-  }
+  gap: 2rem;
+  margin-bottom: 3rem;
 }
 
 .fullWidth {
-  grid-column: 1 / -1;
+  grid-column: span 2;
 }
 
-/* Inputs & Labels */
 .field {
   display: flex;
   flex-direction: column;
@@ -102,140 +87,300 @@
 }
 
 .label {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text-main);
+  font-size: 0.7rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: var(--secondary);
+  letter-spacing: 1px;
 }
 
 .input {
-  padding: 0.875rem 1rem;
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
-  font-size: 1rem;
-  font-family: 'Inter', sans-serif;
-  transition: all 0.2s ease;
-  background-color: #f9fafb;
-  color: var(--text-main);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  padding: 1rem;
+  font-size: 0.95rem;
+  color: var(--secondary);
 }
 
-.input[type="date"] {
-  text-transform: uppercase;
-  font-weight: 500;
-  letter-spacing: 0.05em;
-  font-size: 0.9rem;
-}
-
-.input:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  background-color: var(--white);
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
-}
-
-.inputError {
-  border-color: #ef4444 !important;
-  background-color: #fef2f2 !important;
-}
-
-.inputError:focus {
-  border-color: #ef4444 !important;
-  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1) !important;
-}
-
-.inputReadOnly {
-  background-color: #f1f5f9;
-  cursor: not-allowed;
-}
-
-/* Address Cards */
-.addressGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+/* Botões Adaptáveis */
+.buttonGroup {
+  display: flex;
   gap: 1.5rem;
 }
 
+.saveButton, .addBtn {
+  background-color: var(--secondary);
+  color: white;
+  padding: 1.25rem 3rem;
+  font-weight: 900;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.cancelBtn {
+  background-color: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  padding: 1.25rem 3rem;
+  font-weight: 900;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+/* Endereços Grid */
+.addressGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
 .addressCard {
-  padding: 1.5rem;
-  border: 1.5px solid var(--border-color);
-  border-radius: 12px;
-  position: relative;
-  transition: all 0.2s ease;
+  border: 1px solid var(--border);
+  padding: 2rem;
+  background-color: var(--surface);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  gap: 2rem;
 }
 
-.addressCard:hover {
-  border-color: var(--primary-color);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+.addressActions {
+  display: flex;
+  gap: 1rem;
 }
 
-.addressTag {
+.editAddressBtn {
+  background-color: transparent;
+  color: var(--secondary);
+  border: 1px solid var(--secondary);
+  padding: 0.75rem 1.5rem;
+  font-weight: 900;
   font-size: 0.7rem;
   text-transform: uppercase;
-  background-color: #e2e8f0;
-  color: #475569;
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  font-weight: 700;
-  width: fit-content;
-  margin-bottom: 1rem;
+  letter-spacing: 1px;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex: 1;
 }
 
-.addressInfo h4 {
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-}
-
-.addressInfo p {
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  line-height: 1.5;
+.editAddressBtn:hover {
+  background-color: var(--secondary);
+  color: white;
 }
 
 .removeBtn {
-  margin-top: 1.5rem;
-  color: #dc2626;
-  background: none;
-  border: none;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 0;
-  display: flex;
+  background-color: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  padding: 0.75rem 1.5rem;
+  font-weight: 900;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: var(--transition);
+  display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
+  justify-content: center;
+  gap: 0.5rem;
+  flex: 1;
 }
 
 .removeBtn:hover {
-  text-decoration: underline;
+  border-color: #B76E79;
+  color: #B76E79;
+  background-color: #fffafb;
 }
 
-/* Utils */
-.required {
-  color: #dc2626;
-  margin-left: 2px;
+/* MEDIA QUERIES PARA MOBILE */
+/* Orders List */
+.ordersList {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 }
 
-.saveButton {
-  margin-top: 2rem;
-  padding: 1rem 2.5rem;
-  font-size: 1rem;
+.orderCard {
+  border: 1px solid var(--border);
+  background-color: white;
+  transition: var(--transition);
+}
+
+.orderCard:hover {
+  border-color: var(--secondary);
+}
+
+.orderHeader {
+  background-color: var(--surface);
+  padding: 1.5rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.orderHeader span {
+  font-size: 0.65rem;
+  font-weight: 900;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.orderHeader p {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--secondary);
+  margin: 0.25rem 0 0;
+}
+
+.orderStatus {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.orderItems {
+  padding: 1.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.orderItemSimple {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.orderItemSimple img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  background-color: white;
+  border: 1px solid var(--border);
+}
+
+.orderItemSimple p {
+  font-size: 0.85rem;
   font-weight: 700;
-  width: fit-content;
+  margin: 0;
 }
 
-@media (max-width: 600px) {
-  .saveButton {
+.orderItemSimple span {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Danger Zone */
+.dangerZone {
+  margin-top: 4rem;
+  padding: 2.5rem;
+  border: 1px solid #fee2e2;
+  background-color: #fffafb;
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.dangerZone h4 {
+  color: var(--error);
+  font-size: 1.1rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.dangerZone p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+}
+
+.deleteBtn {
+  background-color: transparent;
+  color: var(--error);
+  border: 1px solid var(--error);
+  padding: 0.75rem 2rem;
+  font-weight: 900;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: var(--transition);
+}
+
+.deleteBtn:hover {
+  background-color: var(--error);
+  color: white;
+}
+
+.messageRow {
+  padding: 1rem;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  text-align: center;
+  font-weight: 800;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 992px) {
+  .container {
+    padding: 2rem 1rem;
+  }
+
+  .header h2 {
+    font-size: 2.25rem;
+  }
+
+  .card {
+    padding: 2rem 1.5rem;
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr; /* Uma coluna no mobile */
+    gap: 1.5rem;
+  }
+
+  .fullWidth {
+    grid-column: span 1;
+  }
+
+  .buttonGroup {
+    flex-direction: column; /* Botões empilhados */
     width: 100%;
+  }
+
+  .saveButton, .cancelBtn, .addBtn {
+    width: 100%; /* Botões ocupam largura total */
+    padding: 1rem;
+  }
+
+  .addressGrid {
+    grid-template-columns: 1fr;
   }
 }
 
-.emptyState {
-  text-align: center;
-  padding: 4rem 2rem;
-  border: 2px dashed var(--border-color);
-  border-radius: 16px;
-  color: var(--text-muted);
+@media (max-width: 480px) {
+  .header h2 {
+    font-size: 1.75rem;
+  }
+  
+  .sectionTitle {
+    font-size: 1.25rem;
+  }
 }

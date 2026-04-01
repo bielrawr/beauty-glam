@@ -10,7 +10,16 @@
 .container {
   display: flex;
   align-items: center;
-  justify-content: space-between; /* Mantém os elementos nas extremidades no Desktop */
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+/* Garante que no Desktop tudo fique em uma linha */
+.topRowMobile {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1; /* Ocupa espaço para empurrar a busca/ações */
   gap: 2rem;
 }
 
@@ -30,7 +39,7 @@
 .nav {
   flex: 1;
   display: flex;
-  justify-content: center; /* Centraliza a busca no Desktop */
+  justify-content: center;
 }
 
 .searchBar {
@@ -44,11 +53,6 @@
   max-width: 450px;
   border: 1px solid var(--border);
   transition: var(--transition);
-}
-
-.searchBar:focus-within {
-  border-color: var(--secondary);
-  background-color: white;
 }
 
 .searchBar input {
@@ -118,7 +122,6 @@
   display: flex;
   align-items: center;
   padding: 0;
-  transition: var(--transition);
 }
 
 .logoutBtn:hover {
@@ -159,7 +162,7 @@
   border: 2px solid white;
 }
 
-/* Modal de Confirmação */
+/* Modal Confirmação */
 .modalOverlay {
   position: fixed;
   top: 0;
@@ -210,17 +213,22 @@
   width: 100%;
 }
 
+/* RESPONSIVIDADE MOBILE */
 @media (max-width: 992px) {
   .container {
-    flex-wrap: wrap;
-    justify-content: space-between;
+    flex-direction: column;
     padding: 1rem;
+    gap: 1.5rem;
+  }
+
+  .topRowMobile {
+    width: 100%;
+    justify-content: space-between;
   }
 
   .nav {
-    order: 3; /* Move busca para baixo no mobile */
     width: 100%;
-    margin-top: 1rem;
+    order: 3;
   }
 
   .searchBar {
@@ -228,14 +236,10 @@
   }
 
   .userName {
-    display: none; /* Poupa espaço no mobile */
+    display: none;
   }
 
   .authWrapper {
     min-width: auto;
-  }
-
-  .hideOnMobile {
-    display: none;
   }
 }
