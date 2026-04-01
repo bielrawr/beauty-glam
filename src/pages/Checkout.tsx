@@ -79,6 +79,26 @@ export function Checkout() {
     currency: 'BRL',
   });
 
+  const searchCEP = async (cep: string) => {
+    const cleanCEP = cep.replace(/\D/g, '');
+    if (cleanCEP.length !== 8) return;
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cleanCEP}/json/`);
+      const data = await response.json();
+      if (!data.erro) {
+        setDeliveryAddress(prev => ({
+          ...prev,
+          street: data.logradouro || prev.street,
+          city: data.localidade || prev.city,
+          state: data.uf || prev.state,
+          zip: maskCEP(cleanCEP)
+        }));
+      }
+    } catch (error) {
+      console.error("Erro ao buscar CEP:", error);
+    }
+  };
+
   const handleFinalizeOrder = async () => {
     if (!user) return;
     if (!deliveryAddress.street || !deliveryAddress.number || !deliveryAddress.zip) {
@@ -185,9 +205,18 @@ export function Checkout() {
           {isEditingAddress || !deliveryAddress.street ? (
             <div className={styles.addressForm}>
               <div className={styles.inputGrid}>
-                <input placeholder="CEP" value={deliveryAddress.zip} onChange={e => setDeliveryAddress({...deliveryAddress, zip: maskCEP(e.target.value)})} />
+                <input 
+                  placeholder="CEP" 
+                  value={deliveryAddress.zip} 
+                  onChange={e => {
+                    const val = e.target.value;
+                    setDeliveryAddress({...deliveryAddress, zip: maskCEP(val)});
+                    if (val.replace(/\D/g, '').length === 8) searchCEP(val);
+                  }} 
+                />
                 <input placeholder="Rua" value={deliveryAddress.street} onChange={e => setDeliveryAddress({...deliveryAddress, street: e.target.value})} />
                 <input placeholder="Número" value={deliveryAddress.number} onChange={e => setDeliveryAddress({...deliveryAddress, number: e.target.value})} />
+                <input placeholder="Complemento" value={deliveryAddress.complement} onChange={e => setDeliveryAddress({...deliveryAddress, complement: e.target.value})} />
                 <input placeholder="Cidade" value={deliveryAddress.city} onChange={e => setDeliveryAddress({...deliveryAddress, city: e.target.value})} />
                 <input placeholder="Estado" value={deliveryAddress.state} onChange={e => setDeliveryAddress({...deliveryAddress, state: e.target.value})} />
               </div>
@@ -197,6 +226,7 @@ export function Checkout() {
             <div className={styles.addressDetails}>
               <p><strong>{deliveryAddress.street}, {deliveryAddress.number}</strong></p>
               <p>{deliveryAddress.city}, {deliveryAddress.state} - {deliveryAddress.zip}</p>
+              {deliveryAddress.complement && <p>{deliveryAddress.complement}</p>}
             </div>
           )}
         </section>

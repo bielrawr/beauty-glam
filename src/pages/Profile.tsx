@@ -345,6 +345,14 @@ export function Profile() {
                     <input className={styles.input} value={currentAddress.complement} onChange={e => setCurrentAddress({...currentAddress, complement: e.target.value})} placeholder="Apto, Bloco..." />
                   </div>
                   <div className={styles.field}>
+                    <span className={styles.label}>Cidade <Required /></span>
+                    <input className={styles.input} value={currentAddress.city} onChange={e => setCurrentAddress({...currentAddress, city: e.target.value})} required />
+                  </div>
+                  <div className={styles.field}>
+                    <span className={styles.label}>Estado <Required /></span>
+                    <input className={styles.input} value={currentAddress.state} onChange={e => setCurrentAddress({...currentAddress, state: e.target.value})} required />
+                  </div>
+                  <div className={styles.field}>
                     <span className={styles.label}>Tipo <Required /></span>
                     <select className={styles.input} value={currentAddress.type} onChange={e => setCurrentAddress({...currentAddress, type: e.target.value})}>
                       <option>Casa</option>
