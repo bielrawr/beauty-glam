@@ -39,6 +39,21 @@ Bem-vindo à **BEAUTYGLAM**, uma aplicação de e-commerce moderna desenvolvida 
 - **Motor de Busca Inteligente**: Filtro em tempo real com normalização de acentos e scroll automático.
 - **Design Mobile-First**: Cabeçalho adaptável que prioriza espaço e usabilidade em telas menores.
 
+### 🎫 Sistema de Cupons & Descontos
+- **Múltiplos Tipos de Desconto**: Suporte para cupons de valor fixo (R$) ou porcentagem (%).
+- **Validação em Tempo Real**: Aplicação imediata no checkout com feedback de erro para códigos inválidos.
+- **Cupons Disponíveis**:
+  - `BEAUTY10`: 10% de desconto em todo o carrinho.
+  - `WELCOME20`: 20% de desconto (especial para novos usuários).
+  - `GLOW15`: 15% de desconto em produtos selecionados.
+  - `SAVE50`: R$ 50,00 de desconto fixo (para compras de alto valor).
+  - `FIRSTOFF`: R$ 30,00 de desconto fixo na primeira compra.
+
+### 📍 Endereçamento Inteligente
+- **Busca via API**: Preenchimento automático de Rua, Cidade e Estado ao digitar o CEP (integração ViaCEP).
+- **Gestão de Endereços**: Possibilidade de salvar múltiplos endereços no perfil (Casa, Trabalho, etc).
+- **Checkout Fluido**: O endereço padrão é carregado automaticamente, mas pode ser alterado rapidamente durante o pagamento.
+
 ---
 
 ## 🛠️ Como Rodar o Projeto
@@ -95,3 +110,4 @@ Para que a autenticação e o banco de dados funcionem, certifique-se de configu
 ---
 
 Desenvolvido por Gabriel Rocha
+# desafio-final-pd

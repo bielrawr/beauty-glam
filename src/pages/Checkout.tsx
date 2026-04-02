@@ -44,11 +44,30 @@ export function Checkout() {
 
   const applyCoupon = () => {
     const code = couponCode.toUpperCase().trim();
-    if (code === 'BEAUTY10') {
-      setDiscount(totalPrice * 0.1);
-      setCouponError('');
-    } else if (code === '') {
+    
+    const coupons: Record<string, { type: 'percentage' | 'fixed', value: number }> = {
+      'BEAUTY10': { type: 'percentage', value: 0.10 },
+      'WELCOME20': { type: 'percentage', value: 0.20 },
+      'GLOW15': { type: 'percentage', value: 0.15 },
+      'SAVE50': { type: 'fixed', value: 50 },
+      'FIRSTOFF': { type: 'fixed', value: 30 }
+    };
+
+    if (code === '') {
       setDiscount(0);
+      setCouponError('');
+      return;
+    }
+
+    const coupon = coupons[code];
+
+    if (coupon) {
+      if (coupon.type === 'percentage') {
+        setDiscount(totalPrice * coupon.value);
+      } else {
+        // Garante que o desconto não seja maior que o total
+        setDiscount(Math.min(coupon.value, totalPrice));
+      }
       setCouponError('');
     } else {
       setDiscount(0);
