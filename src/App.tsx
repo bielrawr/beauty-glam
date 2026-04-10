@@ -11,6 +11,7 @@ import { Checkout } from './pages/Checkout';
 import { OrderSuccess } from './pages/OrderSuccess';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { PageTransition } from './components/PageTransition';
+import { Footer } from './components/Footer';
 import './styles/globals.css';
 
 /**
@@ -57,6 +58,7 @@ function App() {
           />
         </Routes>
       </AnimatePresence>
+      <Footer />
     </div>
   );
 }
