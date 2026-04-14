@@ -53,8 +53,15 @@ export function Register() {
       setLoading(true);
       await register(email, password, displayName);
       navigate('/');
-    } catch (err) {
-      setError('Falha ao criar conta. Verifique os dados ou tente outro e-mail.');
+    } catch (err: any) {
+      console.error("Erro no Registro:", err);
+      if (err.code === 'auth/email-already-in-use') {
+        setError('Este e-mail já está sendo utilizado por outra conta.');
+      } else if (err.code === 'permission-denied') {
+        setError('Erro de permissão no banco de dados. Contate o suporte.');
+      } else {
+        setError('Falha ao criar conta. Verifique os dados ou tente outro e-mail.');
+      }
     } finally {
       setLoading(false);
     }

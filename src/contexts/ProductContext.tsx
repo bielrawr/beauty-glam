@@ -22,17 +22,26 @@ const ProductContext = createContext<ProductContextType | null>(null);
  * Realiza a busca na Makeup API, aplica a localização (tradução) e gerencia a busca global.
  */
 export function ProductProvider({ children }: { children: ReactNode }) {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Inicializa a partir do localStorage para evitar loader se já houver cache
+  const [products, setProducts] = useState<Product[]>(() => {
+    const cached = localStorage.getItem('bg_products_cache');
+    return cached ? JSON.parse(cached) : [];
+  });
+  
+  // Só mostra o loader se NÃO houver cache disponível
+  const [loading, setLoading] = useState(products.length === 0);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
   /**
    * Função central para carregar dados da API e transformar para o formato local.
+   * Implementa estratégia "Stale-While-Revalidate" (mostra cache e busca novos dados).
    */
   const fetchProducts = async () => {
     try {
-      setLoading(true);
+      // Se o cache estiver vazio, precisamos do loader agora
+      if (products.length === 0) setLoading(true);
+      
       const data = await getProducts();
       
       // Mapeamento e Tradução dinâmica para português (PT-BR)
@@ -40,16 +49,22 @@ export function ProductProvider({ children }: { children: ReactNode }) {
       
       setProducts(translated);
       setError(null);
+
+      // Salva no cache persistente para a próxima visita
+      localStorage.setItem('bg_products_cache', JSON.stringify(translated));
     } catch (err) {
       console.error("Erro ao buscar produtos:", err);
-      setError("Erro ao carregar produtos.");
+      // Só exibe erro na tela se não houver dados do cache para mostrar
+      if (products.length === 0) {
+        setError("Erro ao carregar produtos.");
+      }
     } finally {
       setLoading(false);
     }
   };
 
   /**
-   * Executa a busca inicial ao montar o provedor.
+   * Executa a busca ao montar o provedor.
    */
   useEffect(() => {
     fetchProducts();

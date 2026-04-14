@@ -33,6 +33,7 @@ interface AuthContextType {
   changeEmail: (newEmail: string) => Promise<void>;
   refreshProfile: () => Promise<void>;
   deleteAccount: () => Promise<void>;
+  isProfileComplete: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -155,6 +156,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     user, profile, loadingAuth, register, login, loginWithGoogle, logout,
     changePassword: async (p: string) => auth.currentUser ? firebaseUpdatePassword(auth.currentUser, p) : undefined,
     changeEmail: async (e: string) => auth.currentUser ? firebaseUpdateEmail(auth.currentUser, e) : undefined,
+    isProfileComplete: !!(profile?.cpf && profile?.birthDate),
     refreshProfile: () => user ? fetchProfile(user.uid) : Promise.resolve(),
     deleteAccount: async () => { 
       if (auth.currentUser) { 

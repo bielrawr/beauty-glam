@@ -1,4 +1,5 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import Header from './components/Header';
 import { Home } from './pages/Home';
@@ -20,6 +21,13 @@ import './styles/globals.css';
  */
 function App() {
   const location = useLocation();
+
+  /**
+   * Scroll to Top Global: Sempre que a rota mudar, a página abre no início.
+   */
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   return (
     <div className="app-container">

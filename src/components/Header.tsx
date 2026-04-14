@@ -80,15 +80,24 @@ const Header = () => {
           {/* Ações Sempre à Direita */}
           <div className={styles.actions}>
             <div className={styles.authWrapper}>
-              {profile ? (
+              {loadingAuth ? (
+                null // Mantém vazio durante o check inicial do Firebase
+              ) : user ? (
                 <div className={styles.userSession}>
                   <Link to="/profile" className={styles.profileLink}>
                     <User size={18} />
                     <span className={styles.userName}>
-                      {profile.displayName?.split(' ')[0]}
+                      {/* Saudação: Olá, Nome (Perfil > Auth > E-mail) */}
+                      Olá, {(profile?.displayName?.split(' ')[0] || 
+                             user.displayName?.split(' ')[0] || 
+                             user.email?.split('@')[0] || 
+                             'Conta').charAt(0).toUpperCase() + 
+                             (profile?.displayName?.split(' ')[0] || 
+                             user.displayName?.split(' ')[0] || 
+                             user.email?.split('@')[0] || 
+                             'Conta').slice(1).toLowerCase()}.
                     </span>
-                  </Link>
-                  <div className={styles.dividerVertical} />
+                  </Link>                  <div className={styles.dividerVertical} />
                   <button 
                     onClick={() => setShowLogoutModal(true)} 
                     className={styles.logoutBtn} 
@@ -98,11 +107,9 @@ const Header = () => {
                   </button>
                 </div>
               ) : (
-                !loadingAuth && !user && (
-                  <Link to="/login" className={styles.loginBtn}>
-                    Login
-                  </Link>
-                )
+                <Link to="/login" className={styles.loginBtn}>
+                  Login
+                </Link>
               )}
             </div>
 

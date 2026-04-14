@@ -27,6 +27,13 @@ export function Home() {
   const productsSectionRef = useRef<HTMLElement>(null);
 
   /**
+   * Garante que a Home sempre abra no topo ao ser carregada.
+   */
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  /**
    * Lógica do Slide Automático: Rotaciona as imagens a cada 15 segundos.
    */
   useEffect(() => {

@@ -1,7 +1,7 @@
 import { doc, getDoc, setDoc, serverTimestamp, collection, query, where, getDocs, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase/firebase';
 
-const COLLECTION = 'users';
+const COLLECTION = 'profiles';
 
 /**
  * Verifica se um endereço de e-mail já está cadastrado na coleção de usuários do Firestore.
