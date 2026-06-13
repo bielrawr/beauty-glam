@@ -20,4 +20,5 @@ const app = initializeApp(firebaseConfig);
 
 // Exporta as instâncias para uso nos Contexts e Services
 export const auth = getAuth(app);
+auth.languageCode = 'pt-BR';
 export const db = getFirestore(app);

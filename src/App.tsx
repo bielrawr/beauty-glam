@@ -6,7 +6,11 @@ import { Home } from './pages/Home';
 import { Cart } from './pages/Cart';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
+import { VerifyEmail } from './pages/VerifyEmail';
+import { EmailAction } from './pages/EmailAction';
 import { Profile } from './pages/Profile';
+import { Wishlist } from './pages/Wishlist';
+import { SharedWishlist } from './pages/SharedWishlist';
 import { ProductDetails } from './pages/ProductDetails';
 import { Checkout } from './pages/Checkout';
 import { OrderSuccess } from './pages/OrderSuccess';
@@ -38,13 +42,31 @@ function App() {
           <Route path="/" element={<PageTransition><Home /></PageTransition>} />
           <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
           <Route path="/register" element={<PageTransition><Register /></PageTransition>} />
+          <Route path="/verify-email" element={<PageTransition><VerifyEmail /></PageTransition>} />
+          <Route path="/auth/action" element={<PageTransition><EmailAction /></PageTransition>} />
           <Route path="/product/:id" element={<PageTransition><ProductDetails /></PageTransition>} />
           <Route path="/cart" element={<PageTransition><Cart /></PageTransition>} />
+          <Route
+            path="/wishlist/shared"
+            element={
+              <ProtectedRoute>
+                <PageTransition><SharedWishlist /></PageTransition>
+              </ProtectedRoute>
+            }
+          />
           <Route 
             path="/profile" 
             element={
               <ProtectedRoute>
                 <PageTransition><Profile /></PageTransition>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/wishlist" 
+            element={
+              <ProtectedRoute>
+                <PageTransition><Wishlist /></PageTransition>
               </ProtectedRoute>
             } 
           />

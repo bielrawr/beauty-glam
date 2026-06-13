@@ -1,15 +1,25 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { ShoppingCart, User, Search, LogOut, X, AlertTriangle } from 'lucide-react';
+import { Heart, ShoppingCart, User, Search, LogOut, X, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { useProducts } from '../contexts/ProductContext';
+import { useWishlist } from '../contexts/WishlistContext';
 import styles from './Header.module.css';
+
+function formatFirstName(name?: string | null) {
+  const firstName = name?.trim().split(' ')[0];
+
+  if (!firstName) return '';
+
+  return firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
+}
 
 const Header = () => {
   const { user, profile, logout, loadingAuth } = useAuth();
   const { cart } = useCart();
+  const { isWishlistAvailable, totalWishlistItems } = useWishlist();
   const { searchQuery, setSearchQuery } = useProducts();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const navigate = useNavigate();
@@ -17,6 +27,8 @@ const Header = () => {
 
   const isHomePage = location.pathname === '/';
   const totalItems = cart.items.reduce((acc, item) => acc + item.quantity, 0);
+  const displayFirstName = formatFirstName(profile?.displayName || user?.displayName);
+  const hasActiveSession = Boolean(user?.emailVerified);
 
   const handleLogoClick = (e: React.MouseEvent) => {
     if (isHomePage) {
@@ -82,20 +94,12 @@ const Header = () => {
             <div className={styles.authWrapper}>
               {loadingAuth ? (
                 null // Mantém vazio durante o check inicial do Firebase
-              ) : user ? (
+              ) : hasActiveSession ? (
                 <div className={styles.userSession}>
                   <Link to="/profile" className={styles.profileLink}>
                     <User size={18} />
                     <span className={styles.userName}>
-                      {/* Saudação: Olá, Nome (Perfil > Auth > E-mail) */}
-                      Olá, {(profile?.displayName?.split(' ')[0] || 
-                             user.displayName?.split(' ')[0] || 
-                             user.email?.split('@')[0] || 
-                             'Conta').charAt(0).toUpperCase() + 
-                             (profile?.displayName?.split(' ')[0] || 
-                             user.displayName?.split(' ')[0] || 
-                             user.email?.split('@')[0] || 
-                             'Conta').slice(1).toLowerCase()}.
+                      Olá{displayFirstName ? `, ${displayFirstName}` : ''}.
                     </span>
                   </Link>                  <div className={styles.dividerVertical} />
                   <button 
@@ -113,7 +117,27 @@ const Header = () => {
               )}
             </div>
 
-            <Link to="/cart" className={styles.cartButton}>
+            {isWishlistAvailable && (
+              <Link to="/wishlist" className={styles.iconButton} title="Lista de desejos">
+                <Heart size={22} />
+                <AnimatePresence mode="wait">
+                  {totalWishlistItems > 0 && (
+                    <motion.span 
+                      key={totalWishlistItems}
+                      className={styles.badge}
+                      initial={{ scale: 0.5, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 1.5, opacity: 0 }}
+                      transition={{ duration: 0.3, ease: "easeOut" }}
+                    >
+                      {totalWishlistItems}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </Link>
+            )}
+
+            <Link to="/cart" className={styles.iconButton}>
               <ShoppingCart size={22} />
               <AnimatePresence mode="wait">
                 {totalItems > 0 && (
@@ -165,3 +189,4 @@ const Header = () => {
 };
 
 export default Header;
+

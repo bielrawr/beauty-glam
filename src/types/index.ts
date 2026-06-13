@@ -47,6 +47,19 @@ export interface Cart {
   items: CartItem[];
 }
 
+export interface WishlistItem {
+  productId: number;
+  title: string;
+  price: number;
+  image: string;
+  description: string;
+  category: string;
+}
+
+export interface Wishlist {
+  items: WishlistItem[];
+}
+
 export interface OrderItem extends CartItem {}
 
 export interface Order {
@@ -55,6 +68,6 @@ export interface Order {
   items: OrderItem[];
   totalPrice: number;
   status: 'pending' | 'paid' | 'shipped' | 'delivered' | 'cancelled';
-  createdAt: any;
+  createdAt: unknown;
   address: Address;
 }

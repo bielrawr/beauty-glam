@@ -12,12 +12,19 @@
 }
 
 .header h2 {
-  font-size: 3rem;
+  font-size: 2.75rem;
   font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: -1.5px;
+  letter-spacing: 0;
+  line-height: 1;
   color: var(--secondary);
   margin-bottom: 1rem;
+}
+
+.header p {
+  color: var(--text-muted);
+  font-size: 1rem;
+  line-height: 1.6;
 }
 
 /* Tabs: Responsivas com Scroll no Mobile */
@@ -37,11 +44,11 @@
 
 .tabButton {
   background: transparent;
-  padding: 0.75rem 1rem; /* Reduzido de 1rem 1.5rem */
-  font-weight: 900;
-  font-size: 0.65rem; /* Reduzido de 0.75rem */
+  padding: 0.85rem 1rem; /* Reduzido de 1rem 1.5rem */
+  font-weight: 800;
+  font-size: 0.72rem; /* Reduzido de 0.75rem */
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0;
   color: var(--text-muted);
   border-bottom: 2px solid transparent;
   transition: var(--transition);
@@ -61,11 +68,21 @@
 }
 
 .sectionTitle {
-  font-size: 1.5rem;
-  font-weight: 900;
-  text-transform: uppercase;
+  font-size: 1.35rem;
+  font-weight: 850;
+  text-transform: none;
+  letter-spacing: 0;
+  line-height: 1.2;
   margin-bottom: 2.5rem;
   color: var(--secondary);
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
 }
 
 /* Formulários Flexíveis */
@@ -83,23 +100,51 @@
 .field {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.65rem;
 }
 
 .label {
-  font-size: 0.7rem;
-  font-weight: 900;
-  text-transform: uppercase;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: none;
   color: var(--secondary);
-  letter-spacing: 1px;
+  letter-spacing: 0;
+  line-height: 1.3;
 }
 
 .input {
   background-color: var(--surface);
   border: 1px solid var(--border);
-  padding: 1rem;
-  font-size: 0.95rem;
+  padding: 1rem 1.1rem;
+  min-height: 52px;
+  font-size: 0.98rem;
+  font-weight: 500;
+  line-height: 1.4;
   color: var(--secondary);
+}
+
+.input::placeholder {
+  color: #8a8a8a;
+  font-weight: 400;
+}
+
+.input:focus {
+  background-color: white;
+  border-color: var(--secondary);
+}
+
+.inputInvalid,
+.inputInvalid:focus {
+  border-color: #fda4af;
+  background-color: #fff1f2;
+  box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.08);
+}
+
+.fieldError {
+  color: #be123c;
+  font-size: 0.76rem;
+  font-weight: 650;
+  line-height: 1.35;
 }
 
 /* Botões Adaptáveis */
@@ -112,10 +157,10 @@
   background-color: var(--secondary);
   color: white;
   padding: 1.25rem 3rem;
-  font-weight: 900;
-  font-size: 0.8rem;
+  font-weight: 850;
+  font-size: 0.78rem;
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -127,10 +172,17 @@
   color: var(--text-muted);
   border: 1px solid var(--border);
   padding: 1.25rem 3rem;
-  font-weight: 900;
-  font-size: 0.8rem;
+  font-weight: 850;
+  font-size: 0.78rem;
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 0;
+}
+
+.addressForm {
+  margin-bottom: 4rem;
+  padding: 2rem;
+  border: 1px solid var(--border);
+  background-color: white;
 }
 
 /* Endereços Grid */
@@ -150,6 +202,39 @@
   gap: 2rem;
 }
 
+.addressInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.addressInfo h4 {
+  color: var(--secondary);
+  font-size: 1rem;
+  font-weight: 850;
+  line-height: 1.35;
+}
+
+.addressInfo p {
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  font-weight: 500;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.addressTag {
+  width: fit-content;
+  color: var(--primary-hover);
+  background-color: #fff5f5;
+  border: 1px solid #f0dddd;
+  padding: 0.28rem 0.65rem;
+  font-size: 0.68rem;
+  font-weight: 850;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
 .addressActions {
   display: flex;
   gap: 1rem;
@@ -160,10 +245,10 @@
   color: var(--secondary);
   border: 1px solid var(--secondary);
   padding: 0.75rem 1.5rem;
-  font-weight: 900;
-  font-size: 0.7rem;
+  font-weight: 850;
+  font-size: 0.72rem;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0;
   transition: var(--transition);
   display: inline-flex;
   align-items: center;
@@ -182,10 +267,10 @@
   color: var(--text-muted);
   border: 1px solid var(--border);
   padding: 0.75rem 1.5rem;
-  font-weight: 900;
-  font-size: 0.7rem;
+  font-weight: 850;
+  font-size: 0.72rem;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0;
   transition: var(--transition);
   display: inline-flex;
   align-items: center;
@@ -234,7 +319,7 @@
   font-weight: 900;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0;
 }
 
 .orderHeader p {
@@ -251,7 +336,7 @@
   font-size: 0.75rem;
   font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0;
 }
 
 .orderItems {
@@ -318,7 +403,7 @@
   font-weight: 900;
   font-size: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0;
   transition: var(--transition);
 }
 
@@ -334,8 +419,10 @@
   text-align: center;
   font-weight: 800;
   font-size: 0.85rem;
+  line-height: 1.5;
   text-transform: uppercase;
   margin-bottom: 2rem;
+  white-space: pre-line;
 }
 
 @media (max-width: 992px) {
@@ -363,6 +450,12 @@
   .buttonGroup {
     flex-direction: column; /* Botões empilhados */
     width: 100%;
+  }
+
+  .sectionHeader {
+    flex-direction: column;
+    align-items: stretch;
+    margin-bottom: 2rem;
   }
 
   .saveButton, .cancelBtn, .addBtn {

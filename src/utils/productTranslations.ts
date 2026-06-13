@@ -1,3 +1,6 @@
+import { Product } from '../types';
+import { getLocalProductDescription } from '../data/productDescriptions';
+
 /**
  * Motor de Localização BeautyGlam (Otimizado)
  * Traduzimos apenas Títulos e Categorias para manter a fluidez e integridade técnica.
@@ -19,9 +22,9 @@ const categoryMap: Record<string, string> = {
 };
 
 /**
- * Traduz apenas o essencial para a vitrine e preserva a descrição original da API.
+ * Localiza o conteúdo do produto para PT-BR sem depender da descrição da API.
  */
-export const translateProduct = (product: any) => {
+export const translateProduct = (product: Product): Product => {
   if (!product) return product;
 
   // Tradução simples do título
@@ -34,7 +37,11 @@ export const translateProduct = (product: any) => {
   return {
     ...product,
     title: translatedTitle,
-    description: product.description, // Mantido original conforme solicitado
-    category: categoryMap[product.category?.toLowerCase()] || product.category || "Maquiagem"
+    category: categoryMap[product.category?.toLowerCase()] || product.category || "Maquiagem",
+    description: getLocalProductDescription({
+      ...product,
+      title: translatedTitle,
+      category: categoryMap[product.category?.toLowerCase()] || product.category || "Maquiagem",
+    }),
   };
 };

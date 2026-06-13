@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { AppDialog, AppDialogVariant } from '../components/AppDialog';
 import { updateProfileData, updateAddresses } from '../services/userService';
 import { getUserOrders } from '../services/orderService';
-import { validateCPF, maskCPF, maskCEP } from '../utils/validators';
-import { Order } from '../types';
+import { getCPFValidationError, getPhoneValidationError, validateCPF, validatePhone, maskCPF, maskPhone, maskCEP } from '../utils/validators';
+import { getAuthErrorMessage } from '../utils/authErrorMessages';
+import { Address, Order } from '../types';
 import { 
   Package, 
   Truck, 
@@ -18,6 +20,15 @@ import {
 } from 'lucide-react';
 import styles from './Profile.module.css';
 
+type ProfileDialog = {
+  title: string;
+  message: string;
+  variant: AppDialogVariant;
+  confirmLabel?: string;
+  cancelLabel?: string;
+  onConfirm?: () => void | Promise<void>;
+};
+
 export function Profile() {
   const { user, profile, refreshProfile, changeEmail, changePassword, deleteAccount } = useAuth();
   const [activeTab, setActiveTab] = useState('data');
@@ -25,6 +36,7 @@ export function Profile() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(false);
   const [message, setMessage] = useState<{type: 'success' | 'error', text: string} | null>(null);
+  const [dialog, setDialog] = useState<ProfileDialog | null>(null);
 
   const [formData, setFormData] = useState({
     displayName: profile?.displayName || '',
@@ -32,6 +44,11 @@ export function Profile() {
     phone2: profile?.phone2 || '',
     cpf: profile?.cpf || '',
     birthDate: profile?.birthDate || '',
+  });
+  const [fieldTouched, setFieldTouched] = useState({
+    cpf: false,
+    phone: false,
+    phone2: false,
   });
 
   const [securityData, setSecurityData] = useState({
@@ -44,9 +61,23 @@ export function Profile() {
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [isEditingAddress, setIsEditingAddress] = useState(false);
   const [cepLoading, setCepLoading] = useState(false);
-  const [currentAddress, setCurrentAddress] = useState({
-    id: null as number | null, street: '', city: '', state: '', zip: '', type: 'Casa', number: '', complement: ''
-  });
+  type DraftAddress = Omit<Address, 'id'> & { id: number | null };
+  const emptyAddress: DraftAddress = {
+    id: null,
+    street: '',
+    city: '',
+    state: '',
+    zip: '',
+    type: 'Casa',
+    number: '',
+    complement: '',
+  };
+  const [currentAddress, setCurrentAddress] = useState<DraftAddress>(emptyAddress);
+  const fieldErrors = {
+    cpf: fieldTouched.cpf ? getCPFValidationError(formData.cpf) : '',
+    phone: fieldTouched.phone ? getPhoneValidationError(formData.phone) : '',
+    phone2: fieldTouched.phone2 ? getPhoneValidationError(formData.phone2, 'Celular alternativo') : '',
+  };
 
   useEffect(() => {
     if (profile) {
@@ -83,13 +114,38 @@ export function Profile() {
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
-    if (formData.cpf && !validateCPF(formData.cpf)) {
-      setMessage({ type: 'error', text: 'CPF inválido.' });
+
+    const updatedProfileData = {
+      ...formData,
+      displayName: formData.displayName.trim(),
+      cpf: maskCPF(formData.cpf),
+      phone: maskPhone(formData.phone),
+      phone2: formData.phone2 ? maskPhone(formData.phone2) : '',
+    };
+
+    if (!updatedProfileData.displayName || !updatedProfileData.cpf || !updatedProfileData.birthDate || !updatedProfileData.phone) {
+      setFieldTouched({ cpf: true, phone: true, phone2: Boolean(updatedProfileData.phone2) });
+      setMessage({ type: 'error', text: 'Preencha nome completo, celular, CPF e data de nascimento.\nEsses dados são obrigatórios.' });
+      return;
+    }
+    if (!validateCPF(updatedProfileData.cpf)) {
+      setFieldTouched(prev => ({ ...prev, cpf: true }));
+      setMessage(null);
+      return;
+    }
+    if (!validatePhone(updatedProfileData.phone)) {
+      setFieldTouched(prev => ({ ...prev, phone: true }));
+      setMessage(null);
+      return;
+    }
+    if (updatedProfileData.phone2 && !validatePhone(updatedProfileData.phone2)) {
+      setFieldTouched(prev => ({ ...prev, phone2: true }));
+      setMessage(null);
       return;
     }
     setLoading(true);
     try {
-      await updateProfileData(user.uid, formData);
+      await updateProfileData(user.uid, updatedProfileData);
       await refreshProfile();
       setMessage({ type: 'success', text: 'Dados atualizados com sucesso!' });
     } catch (err) {
@@ -112,7 +168,7 @@ export function Profile() {
       setMessage({ type: 'success', text: 'Credenciais atualizadas!' });
       setSecurityData(prev => ({ ...prev, password: '', confirmPassword: '' }));
     } catch (err: any) {
-      setMessage({ type: 'error', text: err.message || 'Erro ao atualizar segurança.' });
+      setMessage({ type: 'error', text: getAuthErrorMessage(err, 'Erro ao atualizar segurança.\nTente novamente em alguns instantes.') });
     } finally {
       setLoading(false);
     }
@@ -145,11 +201,16 @@ export function Profile() {
     e.preventDefault();
     if (!user) return;
 
-    let updated;
-    if (isEditingAddress && currentAddress.id) {
-      updated = addresses.map(a => a.id === currentAddress.id ? { ...currentAddress } : a);
+    const addressToSave: Address = {
+      ...currentAddress,
+      id: currentAddress.id ?? Date.now(),
+    };
+
+    let updated: Address[];
+    if (isEditingAddress && currentAddress.id !== null) {
+      updated = addresses.map(a => a.id === currentAddress.id ? addressToSave : a);
     } else {
-      updated = [...addresses, { ...currentAddress, id: Date.now() }];
+      updated = [...addresses, addressToSave];
     }
 
     try {
@@ -158,13 +219,17 @@ export function Profile() {
       await refreshProfile();
       setShowAddressForm(false);
       setIsEditingAddress(false);
-      setCurrentAddress({ id: null, street: '', city: '', state: '', zip: '', type: 'Casa', number: '', complement: '' });
-    } catch (err) {
-      alert("Erro ao salvar endereço.");
+      setCurrentAddress(emptyAddress);
+    } catch {
+      setDialog({
+        title: 'Endereço não salvo',
+        message: 'Não foi possível salvar o endereço.\nTente novamente em alguns instantes.',
+        variant: 'error',
+      });
     }
   };
 
-  const handleEditClick = (address: any) => {
+  const handleEditClick = (address: Address) => {
     setCurrentAddress({ ...address });
     setIsEditingAddress(true);
     setShowAddressForm(true);
@@ -172,12 +237,30 @@ export function Profile() {
 
   const removeAddress = async (id: number) => {
     if (!user) return;
-    if (window.confirm("Excluir este endereço?")) {
-      const updated = addresses.filter(a => a.id !== id);
-      await updateAddresses(user.uid, updated);
-      setAddresses(updated);
-      await refreshProfile();
-    }
+    setDialog({
+      title: 'Excluir endereço?',
+      message: 'Esta ação remove o endereço do seu perfil.\nVocê poderá cadastrar outro depois.',
+      variant: 'danger',
+      confirmLabel: 'Excluir',
+      cancelLabel: 'Cancelar',
+      onConfirm: async () => {
+        const updated = addresses.filter(a => a.id !== id);
+        await updateAddresses(user.uid, updated);
+        setAddresses(updated);
+        await refreshProfile();
+      },
+    });
+  };
+
+  const handleDeleteAccountClick = () => {
+    setDialog({
+      title: 'Excluir conta?',
+      message: 'Esta ação é permanente.\nSeus dados e histórico de pedidos serão removidos.',
+      variant: 'danger',
+      confirmLabel: 'Excluir conta',
+      cancelLabel: 'Cancelar',
+      onConfirm: deleteAccount,
+    });
   };
 
   const getStatusInfo = (status: Order['status']) => {
@@ -193,7 +276,25 @@ export function Profile() {
   const Required = () => <span className={styles.required}>*</span>;
 
   return (
-    <div className={styles.container}>
+    <>
+      {dialog && (
+        <AppDialog
+          open={!!dialog}
+          title={dialog.title}
+          message={dialog.message}
+          variant={dialog.variant}
+          confirmLabel={dialog.confirmLabel}
+          cancelLabel={dialog.cancelLabel}
+          onCancel={() => setDialog(null)}
+          onConfirm={() => {
+            const action = dialog.onConfirm;
+            setDialog(null);
+            void action?.();
+          }}
+        />
+      )}
+
+      <div className={styles.container}>
       <header className={styles.header}>
         <h2>Minha Conta</h2>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
@@ -237,7 +338,7 @@ export function Profile() {
         )}
 
         {activeTab === 'data' && (
-          <form onSubmit={handleUpdateProfile}>
+          <form onSubmit={handleUpdateProfile} noValidate>
             <h3 className={styles.sectionTitle}>Dados Pessoais</h3>
             <div className={styles.formGrid}>
               <div className={`${styles.field} ${styles.fullWidth}`}>
@@ -246,11 +347,53 @@ export function Profile() {
               </div>
               <div className={styles.field}>
                 <span className={styles.label}>CPF <Required /></span>
-                <input className={styles.input} value={maskCPF(formData.cpf)} onChange={e => setFormData({...formData, cpf: e.target.value})} maxLength={14} required />
+                <input
+                  className={`${styles.input} ${fieldErrors.cpf ? styles.inputInvalid : ''}`}
+                  value={maskCPF(formData.cpf)}
+                  onBlur={() => setFieldTouched(prev => ({ ...prev, cpf: true }))}
+                  onChange={e => {
+                    setFieldTouched(prev => ({ ...prev, cpf: true }));
+                    setFormData({...formData, cpf: maskCPF(e.target.value)});
+                  }}
+                  maxLength={14}
+                  required
+                />
+                {fieldErrors.cpf && <small className={styles.fieldError}>{fieldErrors.cpf}</small>}
               </div>
               <div className={styles.field}>
                 <span className={styles.label}>Nascimento <Required /></span>
                 <input className={styles.input} type="date" value={formData.birthDate} onChange={e => setFormData({...formData, birthDate: e.target.value})} required />
+              </div>
+              <div className={styles.field}>
+                <span className={styles.label}>Celular <Required /></span>
+                <input
+                  className={`${styles.input} ${fieldErrors.phone ? styles.inputInvalid : ''}`}
+                  value={maskPhone(formData.phone)}
+                  onBlur={() => setFieldTouched(prev => ({ ...prev, phone: true }))}
+                  onChange={e => {
+                    setFieldTouched(prev => ({ ...prev, phone: true }));
+                    setFormData({...formData, phone: maskPhone(e.target.value)});
+                  }}
+                  inputMode="numeric"
+                  maxLength={15}
+                  required
+                />
+                {fieldErrors.phone && <small className={styles.fieldError}>{fieldErrors.phone}</small>}
+              </div>
+              <div className={styles.field}>
+                <span className={styles.label}>Celular alternativo</span>
+                <input
+                  className={`${styles.input} ${fieldErrors.phone2 ? styles.inputInvalid : ''}`}
+                  value={maskPhone(formData.phone2)}
+                  onBlur={() => setFieldTouched(prev => ({ ...prev, phone2: true }))}
+                  onChange={e => {
+                    setFieldTouched(prev => ({ ...prev, phone2: true }));
+                    setFormData({...formData, phone2: maskPhone(e.target.value)});
+                  }}
+                  inputMode="numeric"
+                  maxLength={15}
+                />
+                {fieldErrors.phone2 && <small className={styles.fieldError}>{fieldErrors.phone2}</small>}
               </div>
             </div>
             <button className={styles.saveButton} type="submit" disabled={loading}>
@@ -302,12 +445,12 @@ export function Profile() {
 
         {activeTab === 'addresses' && (
           <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
+            <div className={styles.sectionHeader}>
               <h3 className={styles.sectionTitle} style={{ marginBottom: 0 }}>Meus Endereços</h3>
               {!showAddressForm && (
                 <button className={styles.addBtn} onClick={() => {
                   setIsEditingAddress(false);
-                  setCurrentAddress({ id: null, street: '', city: '', state: '', zip: '', type: 'Casa', number: '', complement: '' });
+                  setCurrentAddress(emptyAddress);
                   setShowAddressForm(true);
                 }}>
                   <Plus size={18} /> Adicionar Novo
@@ -316,7 +459,7 @@ export function Profile() {
             </div>
 
             {showAddressForm && (
-              <form onSubmit={handleSaveAddress} style={{ marginBottom: '4rem', padding: '2rem', border: '1px solid var(--border)' }}>
+              <form onSubmit={handleSaveAddress} className={styles.addressForm}>
                 <div className={styles.formGrid}>
                   <div className={styles.field}>
                     <span className={styles.label}>CEP <Required /></span>
@@ -413,9 +556,7 @@ export function Profile() {
             <div className={styles.dangerZone}>
               <h4>Zona de Perigo</h4>
               <p>Ao excluir sua conta, todos os seus dados e histórico de pedidos serão removidos permanentemente.</p>
-              <button type="button" onClick={() => {
-                if (window.confirm("ATENÇÃO: Deseja realmente excluir sua conta?")) deleteAccount();
-              }} className={styles.deleteBtn}>
+              <button type="button" onClick={handleDeleteAccountClick} className={styles.deleteBtn}>
                 Excluir Conta Permanentemente
               </button>
             </div>
@@ -426,6 +567,7 @@ export function Profile() {
           </form>
         )}
       </div>
-    </div>
+      </div>
+    </>
   );
 }

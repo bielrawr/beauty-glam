@@ -1,5 +1,6 @@
 import { doc, getDoc, setDoc, serverTimestamp, collection, query, where, getDocs, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase/firebase';
+import { Address, UserProfile } from '../types';
 
 const COLLECTION = 'profiles';
 
@@ -21,7 +22,7 @@ export const getUserByEmail = async (email: string) => {
  * Cria ou atualiza o perfil completo do usuário no Firestore.
  * Garante que campos essenciais como endereços e datas de auditoria existam.
  */
-export const createUserProfile = async (userId: string, profileData: any) => {
+export const createUserProfile = async (userId: string, profileData: Partial<UserProfile>) => {
   try {
     const userRef = doc(db, COLLECTION, userId);
     await setDoc(userRef, {
@@ -40,7 +41,7 @@ export const createUserProfile = async (userId: string, profileData: any) => {
  * Atualiza campos específicos do perfil do usuário (ex: nome, telefone).
  * Registra automaticamente a data da última atualização.
  */
-export const updateProfileData = async (userId: string, data: any) => {
+export const updateProfileData = async (userId: string, data: Partial<UserProfile>) => {
   try {
     const userRef = doc(db, COLLECTION, userId);
     await setDoc(userRef, {
@@ -56,7 +57,7 @@ export const updateProfileData = async (userId: string, data: any) => {
 /**
  * Atualiza exclusivamente a lista de endereços salvos pelo usuário.
  */
-export const updateAddresses = async (userId: string, addresses: any[]) => {
+export const updateAddresses = async (userId: string, addresses: Address[]) => {
   try {
     const userRef = doc(db, COLLECTION, userId);
     await setDoc(userRef, {

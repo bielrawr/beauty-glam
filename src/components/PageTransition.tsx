@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import type { Transition } from 'framer-motion';
 import { ReactNode } from 'react';
 
 interface PageTransitionProps {
@@ -26,7 +27,7 @@ const pageVariants = {
 /**
  * Configuração técnica do tempo e suavidade da transição.
  */
-const pageTransition = {
+const pageTransition: Transition = {
   type: 'tween',
   ease: 'anticipate',
   duration: 0.4,

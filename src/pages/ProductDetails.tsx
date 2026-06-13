@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, ShoppingBag, Star, ShieldCheck, Truck, RefreshCcw } from 'lucide-react';
+import { ArrowLeft, Heart, ShoppingBag, Star, ShieldCheck, Truck, RefreshCcw } from 'lucide-react';
 import { getProductById } from '../services/productsApi';
 import { useCart } from '../contexts/CartContext';
+import { useWishlist } from '../contexts/WishlistContext';
 import { translateProduct } from '../utils/productTranslations';
 import { Product } from '../types';
 import styles from './ProductDetails.module.css';
@@ -11,6 +12,7 @@ export function ProductDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { addItem } = useCart();
+  const { isWishlistAvailable, isInWishlist, toggleWishlist } = useWishlist();
   
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -57,6 +59,7 @@ export function ProductDetails() {
     style: 'currency',
     currency: 'BRL',
   }).format(product.price);
+  const wished = isInWishlist(product.id);
 
   return (
     <div className={`container ${styles.container}`}>
@@ -96,13 +99,29 @@ export function ProductDetails() {
 
           <p className={styles.description}>{product.description}</p>
 
-          <button 
-            className={styles.buyButton}
-            onClick={() => addItem(product)}
-          >
-            <ShoppingBag size={20} />
-            ADICIONAR AO CARRINHO
-          </button>
+          <div className={`${styles.actionRow} ${!isWishlistAvailable ? styles.actionRowSingle : ''}`}>
+            <button 
+              className={styles.buyButton}
+              onClick={() => addItem(product)}
+            >
+              <ShoppingBag size={20} />
+              <span>ADICIONAR</span>
+              <span className={styles.buyButtonExtra}>AO CARRINHO</span>
+            </button>
+
+            {isWishlistAvailable && (
+              <button
+                className={`${styles.wishlistButton} ${wished ? styles.wishlistButtonActive : ''}`}
+                onClick={() => toggleWishlist(product)}
+                title={wished ? 'Remover da lista de desejos' : 'Adicionar a lista de desejos'}
+              >
+                <Heart size={18} fill={wished ? 'currentColor' : 'none'} />
+                <span className={styles.wishlistText}>
+                  {wished ? 'REMOVER DA LISTA DE DESEJOS' : 'ADICIONAR A LISTA DE DESEJOS'}
+                </span>
+              </button>
+            )}
+          </div>
 
           <div className={styles.benefits}>
             <div className={styles.benefitItem}>

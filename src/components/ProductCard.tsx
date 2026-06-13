@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ShoppingBag, Star } from 'lucide-react';
+import { Heart, ShoppingBag, Star } from 'lucide-react';
 import { Product } from '../types';
 import { useCart } from '../contexts/CartContext';
+import { useWishlist } from '../contexts/WishlistContext';
 import styles from './ProductCard.module.css';
 
 interface ProductCardProps {
@@ -11,11 +12,19 @@ interface ProductCardProps {
 
 const ProductCard = ({ product }: ProductCardProps) => {
   const { addItem } = useCart();
+  const { isWishlistAvailable, isInWishlist, toggleWishlist } = useWishlist();
+  const wished = isInWishlist(product.id);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     addItem(product);
+  };
+
+  const handleToggleWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleWishlist(product);
   };
 
   const isNew = product.id % 8 === 0;
@@ -30,6 +39,18 @@ const ProductCard = ({ product }: ProductCardProps) => {
       <Link to={`/product/${product.id}`} className={styles.link}>
         <div className={styles.imageContainer}>
           {isNew && <span className={styles.badge}>NEW</span>}
+
+          {isWishlistAvailable && (
+            <button
+              type="button"
+              className={`${styles.wishlistButton} ${wished ? styles.wishlistButtonActive : ''}`}
+              onClick={handleToggleWishlist}
+              aria-label={wished ? 'Remover da lista de desejos' : 'Adicionar a lista de desejos'}
+              title={wished ? 'Remover da lista de desejos' : 'Adicionar a lista de desejos'}
+            >
+              <Heart size={16} fill={wished ? 'currentColor' : 'none'} />
+            </button>
+          )}
           
           <img src={product.image} alt={product.title} className={styles.image} />
           
@@ -46,7 +67,8 @@ const ProductCard = ({ product }: ProductCardProps) => {
             onClick={handleAddToCart}
           >
             <ShoppingBag size={14} />
-            ADICIONAR AO CARRINHO
+            <span>ADICIONAR</span>
+            <span className={styles.quickAddExtra}>AO CARRINHO</span>
           </button>
         </div>
         

@@ -89,6 +89,29 @@
 }
 
 /* Botão de Compra "Ghost" Minimalista */
+.wishlistButton {
+  align-items: center;
+  background-color: white;
+  border: 1px solid var(--border);
+  color: var(--secondary);
+  display: inline-flex;
+  height: 38px;
+  justify-content: center;
+  padding: 0;
+  position: absolute;
+  right: 0.75rem;
+  top: 0.75rem;
+  transition: var(--transition);
+  width: 38px;
+  z-index: 12;
+}
+
+.wishlistButton:hover,
+.wishlistButtonActive {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
 .quickAdd {
   position: absolute;
   bottom: 1rem;
@@ -119,6 +142,10 @@
 
 .quickAdd:hover {
   background-color: var(--primary);
+}
+
+.quickAddExtra {
+  display: inline;
 }
 
 .content {
@@ -180,7 +207,7 @@
 
 .rating {
   position: absolute;
-  top: 0.75rem;
+  top: 3.45rem;
   right: 0.75rem;
   display: flex;
   align-items: center;
@@ -192,4 +219,114 @@
   background: white;
   padding: 2px 5px;
   border: 1px solid #EEE;
+}
+
+@media (max-width: 700px) {
+  .card {
+    border-color: #eeeeee;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.035);
+    overflow: hidden;
+  }
+
+  .imageContainer {
+    aspect-ratio: 1 / 1.05;
+    padding: 0.75rem;
+  }
+
+  .wishlistButton {
+    height: 32px;
+    right: 0.45rem;
+    top: 0.45rem;
+    width: 32px;
+  }
+
+  .wishlistButton svg {
+    height: 14px;
+    width: 14px;
+  }
+
+  .badge {
+    font-size: 0.52rem;
+    left: 0.45rem;
+    letter-spacing: 1px;
+    padding: 0.22rem 0.42rem;
+    top: 0.45rem;
+  }
+
+  .rating {
+    display: none;
+  }
+
+  .quickAdd {
+    bottom: 0.55rem;
+    font-size: 0.58rem;
+    gap: 0.25rem;
+    left: 0.55rem;
+    letter-spacing: 0.6px;
+    opacity: 1;
+    padding: 0.55rem 0.35rem;
+    right: 0.55rem;
+    transform: none;
+  }
+
+  .quickAdd svg {
+    height: 12px;
+    width: 12px;
+  }
+
+  .quickAddExtra {
+    display: none;
+  }
+
+  .content {
+    gap: 0.2rem;
+    padding: 0.75rem 0.6rem 0.85rem;
+  }
+
+  .category {
+    font-size: 0.48rem;
+    letter-spacing: 0.8px;
+    margin-bottom: 0.25rem;
+    max-width: 100%;
+    overflow: hidden;
+    padding: 0.16rem 0.4rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .title {
+    font-size: 0.76rem;
+    height: 2.15rem;
+    line-height: 1.35;
+    margin: 0.1rem 0;
+  }
+
+  .priceContainer {
+    margin-top: 0.2rem;
+  }
+
+  .currency {
+    font-size: 0.62rem;
+  }
+
+  .price {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .imageContainer {
+    padding: 0.6rem;
+  }
+
+  .quickAdd {
+    font-size: 0.54rem;
+    left: 0.45rem;
+    right: 0.45rem;
+  }
+
+  .content {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
 }

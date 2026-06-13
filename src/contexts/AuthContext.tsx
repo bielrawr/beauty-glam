@@ -7,8 +7,12 @@ import {
   signOut,
   GoogleAuthProvider,
   signInWithPopup,
+  updateProfile,
   updateEmail as firebaseUpdateEmail,
   updatePassword as firebaseUpdatePassword,
+  sendEmailVerification,
+  sendPasswordResetEmail,
+  reload,
   deleteUser,
   User,
   UserCredential,
@@ -17,6 +21,7 @@ import { auth } from '../firebase/firebase';
 import { createUserProfile, getUserProfile, getUserByEmail, deleteUserProfile } from '../services/userService';
 import { UserProfile } from '../types';
 import { generateCustomerId } from '../utils/validators';
+import { getProfileCompletion } from '../utils/profileCompletion';
 
 /**
  * Definição do formato do contexto de autenticação.
@@ -28,6 +33,9 @@ interface AuthContextType {
   register: (email: string, password: string, displayName?: string) => Promise<UserCredential>;
   login: (email: string, password: string) => Promise<UserCredential>;
   loginWithGoogle: () => Promise<UserCredential>;
+  sendVerificationEmail: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
+  refreshUser: () => Promise<User | null>;
   logout: () => Promise<void>;
   changePassword: (newPassword: string) => Promise<void>;
   changeEmail: (newEmail: string) => Promise<void>;
@@ -39,6 +47,16 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 const googleProvider = new GoogleAuthProvider();
 const PROFILE_CACHE_KEY = '@beautyglam:user_profile_v2';
+
+const getEmailVerificationSettings = () => ({
+  url: `${window.location.origin}/login?verified=1`,
+  handleCodeInApp: false,
+});
+
+const getPasswordResetSettings = () => ({
+  url: `${window.location.origin}/login?passwordReset=1`,
+  handleCodeInApp: false,
+});
 
 /**
  * AuthProvider: Gerencia o estado global de autenticação e perfil do usuário.
@@ -82,13 +100,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         setUser(firebaseUser);
-        await fetchProfile(firebaseUser.uid);
+        if (!firebaseUser.emailVerified) {
+          setProfile(null);
+          localStorage.removeItem(PROFILE_CACHE_KEY);
+          setLoadingAuth(false);
+          return;
+        }
+
+        setLoadingAuth(false);
+        fetchProfile(firebaseUser.uid);
       } else {
         setUser(null);
         setProfile(null);
         localStorage.removeItem(PROFILE_CACHE_KEY);
+        setLoadingAuth(false);
       }
-      setLoadingAuth(false);
     });
     return () => unsub();
   }, []);
@@ -98,15 +124,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
    */
   async function register(email: string, password: string, displayName = '') {
     const cred = await createUserWithEmailAndPassword(auth, email, password);
+    const normalizedDisplayName = displayName.trim() || email.split('@')[0];
     const newProfile = {
       email: cred.user.email || '',
-      displayName: displayName || email.split('@')[0],
+      displayName: normalizedDisplayName,
       customerId: generateCustomerId(),
       addresses: []
     };
+    await updateProfile(cred.user, { displayName: normalizedDisplayName });
     await createUserProfile(cred.user.uid, newProfile);
-    setProfile(newProfile);
-    localStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(newProfile));
+    await sendEmailVerification(cred.user, getEmailVerificationSettings());
+    localStorage.removeItem(PROFILE_CACHE_KEY);
+    setUser(null);
+    setProfile(null);
+    await signOut(auth);
     return cred;
   }
 
@@ -149,14 +180,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return signOut(auth);
   }
 
+  async function sendVerificationEmail() {
+    if (!auth.currentUser || auth.currentUser.emailVerified) return;
+    await sendEmailVerification(auth.currentUser, getEmailVerificationSettings());
+  }
+
+  async function refreshUser() {
+    if (!auth.currentUser) return null;
+    await reload(auth.currentUser);
+    setUser(auth.currentUser);
+    return auth.currentUser;
+  }
+
   /**
    * Memorização do valor do contexto para otimização de performance.
    */
   const value = useMemo(() => ({ 
     user, profile, loadingAuth, register, login, loginWithGoogle, logout,
+    sendVerificationEmail,
+    resetPassword: (email: string) => sendPasswordResetEmail(auth, email, getPasswordResetSettings()),
+    refreshUser,
     changePassword: async (p: string) => auth.currentUser ? firebaseUpdatePassword(auth.currentUser, p) : undefined,
     changeEmail: async (e: string) => auth.currentUser ? firebaseUpdateEmail(auth.currentUser, e) : undefined,
-    isProfileComplete: !!(profile?.cpf && profile?.birthDate),
+    isProfileComplete: getProfileCompletion(profile).isComplete,
     refreshProfile: () => user ? fetchProfile(user.uid) : Promise.resolve(),
     deleteAccount: async () => { 
       if (auth.currentUser) { 

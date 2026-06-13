@@ -1,7 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" fill="none"/>
-  <text x="50%" y="50%" dominant-baseline="central" text-anchor="middle" font-family="Inter, sans-serif" font-weight="900" font-size="16" letter-spacing="-1">
-    <tspan fill="#000000">B</tspan>
-    <tspan fill="#C89595">G</tspan>
-  </text>
+  <rect width="32" height="32" rx="6" fill="#FFFFFF"/>
+  <rect x="1" y="1" width="30" height="30" rx="5" fill="none" stroke="#C89595" stroke-width="2"/>
+  <text x="50%" y="51%" dominant-baseline="central" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="900" font-size="15" letter-spacing="0" fill="#C89595">BG</text>
 </svg>

@@ -1,0 +1,152 @@
+.overlay {
+  align-items: center;
+  background: rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(6px);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 1.25rem;
+  position: fixed;
+  z-index: 9999;
+}
+
+.dialog {
+  background: white;
+  border: 1px solid rgba(200, 149, 149, 0.28);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.2);
+  max-width: 430px;
+  padding: 2.5rem 2rem 2rem;
+  position: relative;
+  text-align: center;
+  width: min(100%, 430px);
+}
+
+.closeBtn {
+  align-items: center;
+  background: transparent;
+  color: var(--text-muted);
+  display: inline-flex;
+  height: 34px;
+  justify-content: center;
+  position: absolute;
+  right: 0.85rem;
+  top: 0.85rem;
+  width: 34px;
+}
+
+.closeBtn:hover {
+  color: var(--primary);
+}
+
+.iconCircle {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--secondary);
+  display: flex;
+  height: 62px;
+  justify-content: center;
+  margin: 0 auto 1.35rem;
+  width: 62px;
+}
+
+.info {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #2563eb;
+}
+
+.success {
+  background: #ecfdf5;
+  border-color: #bbf7d0;
+  color: #15803d;
+}
+
+.warning {
+  background: #fff7ed;
+  border-color: #fed7aa;
+  color: #c2410c;
+}
+
+.error,
+.danger {
+  background: #fff1f2;
+  border-color: #fecdd3;
+  color: #be5a61;
+}
+
+.dialog h2 {
+  color: var(--secondary);
+  font-size: 1.35rem;
+  font-weight: 900;
+  line-height: 1.15;
+  margin-bottom: 0.85rem;
+  text-transform: uppercase;
+}
+
+.dialog p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  margin: 0 auto 1.75rem;
+  max-width: 340px;
+  white-space: pre-line;
+}
+
+.actions {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: 1fr;
+}
+
+.cancelBtn,
+.confirmBtn {
+  align-items: center;
+  display: inline-flex;
+  font-size: 0.8rem;
+  font-weight: 900;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0.85rem 1.1rem;
+  text-transform: uppercase;
+}
+
+.cancelBtn {
+  background: white;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.cancelBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.confirmBtn {
+  background: var(--secondary);
+  color: white;
+}
+
+.confirmBtn:hover {
+  background: var(--primary);
+}
+
+.dangerBtn {
+  background: #be5a61;
+}
+
+.dangerBtn:hover {
+  background: #8f3039;
+}
+
+@media (min-width: 460px) {
+  .actions:has(.cancelBtn) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 460px) {
+  .dialog {
+    padding: 2.2rem 1.25rem 1.5rem;
+  }
+}

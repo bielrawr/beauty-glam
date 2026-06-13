@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { UserPlus, Mail, Lock, User, Check, X } from 'lucide-react';
+import { getAuthErrorMessage } from '../utils/authErrorMessages';
 import styles from './Register.module.css';
 
 export function Register() {
@@ -52,16 +53,10 @@ export function Register() {
       setError('');
       setLoading(true);
       await register(email, password, displayName);
-      navigate('/');
+      navigate('/login?verifySent=1', { replace: true });
     } catch (err: any) {
       console.error("Erro no Registro:", err);
-      if (err.code === 'auth/email-already-in-use') {
-        setError('Este e-mail já está sendo utilizado por outra conta.');
-      } else if (err.code === 'permission-denied') {
-        setError('Erro de permissão no banco de dados. Contate o suporte.');
-      } else {
-        setError('Falha ao criar conta. Verifique os dados ou tente outro e-mail.');
-      }
+      setError(getAuthErrorMessage(err, 'Falha ao criar conta.\nVerifique os dados ou tente outro e-mail.'));
     } finally {
       setLoading(false);
     }

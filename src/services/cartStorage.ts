@@ -13,8 +13,12 @@ export const saveCart = (cart: Cart): void => {
  * Carrega o carrinho do localStorage.
  */
 export const loadCart = (): Cart => {
-  const saved = localStorage.getItem(CART_KEY);
-  return saved ? JSON.parse(saved) : { items: [] };
+  try {
+    const saved = localStorage.getItem(CART_KEY);
+    return saved ? JSON.parse(saved) : { items: [] };
+  } catch {
+    return { items: [] };
+  }
 };
 
 /**

@@ -138,7 +138,7 @@
   letter-spacing: 1px;
 }
 
-.cartButton {
+.iconButton {
   position: relative;
   color: var(--secondary);
   display: flex;
@@ -241,5 +241,114 @@
 
   .authWrapper {
     min-width: auto;
+  }
+}
+
+@media (max-width: 700px) {
+  .header {
+    border-bottom-width: 1px;
+    padding: 0.3rem 0;
+  }
+
+  .container {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.38rem 0.75rem;
+    padding: 0 1rem;
+  }
+
+  .logo {
+    font-size: 1.08rem;
+    grid-column: 1;
+    grid-row: 1;
+    letter-spacing: -0.4px;
+    line-height: 1;
+  }
+
+  .actions {
+    gap: 0.65rem;
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+  }
+
+  .authWrapper {
+    min-width: auto;
+  }
+
+  .loginBtn {
+    font-size: 0.6rem;
+    letter-spacing: 0.6px;
+    padding: 0.4rem 0.65rem;
+  }
+
+  .userSession {
+    gap: 0.45rem;
+    padding: 0.34rem 0.48rem;
+  }
+
+  .profileLink svg,
+  .logoutBtn svg,
+  .iconButton svg {
+    height: 17px;
+    width: 17px;
+  }
+
+  .dividerVertical {
+    height: 13px;
+  }
+
+  .nav {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    order: initial;
+    width: 100%;
+  }
+
+  .nav:empty {
+    display: none;
+  }
+
+  .searchBar {
+    gap: 0.45rem;
+    min-height: 34px;
+    padding: 0.36rem 0.65rem;
+  }
+
+  .searchBar svg {
+    height: 15px;
+    width: 15px;
+  }
+
+  .searchBar input {
+    font-size: 0.78rem;
+  }
+
+  .badge {
+    border-width: 1px;
+    font-size: 0.52rem;
+    height: 15px;
+    right: -7px;
+    top: -7px;
+    width: 15px;
+  }
+}
+
+@media (max-width: 360px) {
+  .container {
+    padding: 0 0.75rem;
+  }
+
+  .logo {
+    font-size: 1.05rem;
+  }
+
+  .actions {
+    gap: 0.6rem;
+  }
+
+  .loginBtn {
+    padding-inline: 0.6rem;
   }
 }

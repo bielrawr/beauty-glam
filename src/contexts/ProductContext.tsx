@@ -24,8 +24,12 @@ const ProductContext = createContext<ProductContextType | null>(null);
 export function ProductProvider({ children }: { children: ReactNode }) {
   // Inicializa a partir do localStorage para evitar loader se já houver cache
   const [products, setProducts] = useState<Product[]>(() => {
-    const cached = localStorage.getItem('bg_products_cache');
-    return cached ? JSON.parse(cached) : [];
+    try {
+      const cached = localStorage.getItem('bg_products_cache');
+      return cached ? JSON.parse(cached).map(translateProduct) : [];
+    } catch {
+      return [];
+    }
   });
   
   // Só mostra o loader se NÃO houver cache disponível
@@ -45,7 +49,7 @@ export function ProductProvider({ children }: { children: ReactNode }) {
       const data = await getProducts();
       
       // Mapeamento e Tradução dinâmica para português (PT-BR)
-      const translated = data.map((p: any) => translateProduct(p));
+      const translated = data.map(translateProduct);
       
       setProducts(translated);
       setError(null);

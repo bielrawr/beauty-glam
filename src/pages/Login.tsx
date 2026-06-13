@@ -1,27 +1,57 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { LogIn, Mail, Lock, Chrome } from 'lucide-react';
+import { LogIn, Mail, Lock, Chrome, UserPlus } from 'lucide-react';
+import { getAuthErrorMessage } from '../utils/authErrorMessages';
 import styles from './Login.module.css';
 
 export function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
   
-  const { login, loginWithGoogle } = useAuth();
+  const { login, loginWithGoogle, resetPassword } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get('verified') === '1') {
+      setSuccess('E-mail confirmado com sucesso.\nAgora acesse sua conta para continuar.');
+      navigate('/login', { replace: true });
+      return;
+    }
+
+    if (searchParams.get('verifySent') === '1') {
+      setSuccess('Cadastro realizado com sucesso.\nEnviamos um link de confirmação para o seu e-mail.\nDepois de confirmar, faça login manualmente.');
+      navigate('/login', { replace: true });
+      return;
+    }
+
+    if (searchParams.get('passwordReset') === '1') {
+      setSuccess('Senha atualizada com sucesso.\nEntre usando sua nova senha.');
+      navigate('/login', { replace: true });
+      return;
+    }
+
+    if (searchParams.get('emailRecovered') === '1') {
+      setSuccess('E-mail da conta recuperado.\nEntre novamente para continuar.');
+      navigate('/login', { replace: true });
+    }
+  }, [navigate, searchParams]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     try {
       setError('');
+      setSuccess('');
       setLoading(true);
-      await login(email, password);
-      navigate('/');
+      const cred = await login(email, password);
+      navigate(cred.user.emailVerified ? '/' : '/verify-email');
     } catch (err: any) {
-      setError(err.message || 'Falha ao acessar a conta.');
+      setError(getAuthErrorMessage(err, 'Falha ao acessar a conta.\nVerifique seus dados e tente novamente.'));
     } finally {
       setLoading(false);
     }
@@ -30,13 +60,36 @@ export function Login() {
   async function handleGoogleLogin() {
     try {
       setError('');
+      setSuccess('');
       setLoading(true);
       await loginWithGoogle();
       navigate('/');
     } catch (err: any) {
-      setError(err.message || 'Falha ao entrar com Google.');
+      setError(getAuthErrorMessage(err, 'Falha ao entrar com Google.\nTente novamente em alguns instantes.'));
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handlePasswordReset() {
+    const cleanEmail = email.trim();
+
+    if (!cleanEmail) {
+      setError('Informe seu e-mail para receber o link de recuperação.');
+      setSuccess('');
+      return;
+    }
+
+    try {
+      setError('');
+      setSuccess('');
+      setResetLoading(true);
+      await resetPassword(cleanEmail);
+      setSuccess('Enviamos um link de recuperação para o e-mail informado.');
+    } catch (err: any) {
+      setError(getAuthErrorMessage(err, 'Não foi possível enviar o e-mail de recuperação.\nTente novamente em alguns instantes.'));
+    } finally {
+      setResetLoading(false);
     }
   }
 
@@ -47,11 +100,12 @@ export function Login() {
           <div className={styles.iconCircle}>
             <LogIn size={24} />
           </div>
-          <h1>Boas-vindas de Volta</h1>
-          <p>Entre para gerenciar seus favoritos e pedidos</p>
+          <h1>Acesse sua conta</h1>
+          <p>Sua beleza reunida em um só lugar.</p>
         </div>
 
         {error && <div className={styles.error}>{error}</div>}
+        {success && <div className={styles.success}>{success}</div>}
 
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.inputGroup}>
@@ -80,6 +134,16 @@ export function Login() {
                 required 
               />
             </div>
+            <div className={styles.passwordHelp}>
+              <button
+                type="button"
+                className={styles.forgotPasswordBtn}
+                onClick={handlePasswordReset}
+                disabled={resetLoading || loading}
+              >
+                {resetLoading ? 'Enviando link...' : 'Recuperar senha'}
+              </button>
+            </div>
           </div>
 
           <button type="submit" className={styles.submitBtn} disabled={loading}>
@@ -102,9 +166,10 @@ export function Login() {
         </button>
 
         <div className={styles.footer}>
-          <span>Ainda não tem conta?</span>
+          <span>Ainda não faz parte da BEAUTYGLAM?</span>
           <Link to="/register" className={styles.registerLink}>
-            Criar conta gratuita
+            <UserPlus size={18} />
+            Criar minha conta
           </Link>
         </div>
       </div>

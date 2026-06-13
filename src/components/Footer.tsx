@@ -1,8 +1,12 @@
 import { Mail, Phone, MapPin, Instagram, Facebook, Youtube } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import styles from './Footer.module.css';
 
 export function Footer() {
+  const { user } = useAuth();
+  const canUseWishlist = Boolean(user?.emailVerified);
+
   return (
     <footer className={styles.footer}>
       <div className={styles.container}>
@@ -20,6 +24,7 @@ export function Footer() {
           <ul className={styles.links}>
             <li><Link to="/">Home</Link></li>
             <li><Link to="/profile">Minha Conta</Link></li>
+            {canUseWishlist && <li><Link to="/wishlist">Lista de Desejos</Link></li>}
             <li><Link to="/cart">Carrinho</Link></li>
           </ul>
         </div>

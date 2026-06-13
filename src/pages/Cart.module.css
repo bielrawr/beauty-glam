@@ -296,20 +296,21 @@
 
   .content {
     grid-template-columns: 1fr;
-    gap: 3rem;
+    gap: 2rem;
   }
 
   .item {
     flex-direction: column;
-    padding: 1.5rem;
-    gap: 1.5rem;
+    padding: 1.25rem;
+    gap: 1rem;
     text-align: center;
   }
 
   .itemImage {
     width: 100%;
-    max-width: 200px;
-    height: 200px;
+    max-width: 160px;
+    height: 160px;
+    padding: 1rem;
   }
 
   .controls {
@@ -327,17 +328,194 @@
 
   .summaryCard {
     position: static;
-    padding: 2rem;
+    padding: 1.75rem;
+  }
+}
+
+@media (max-width: 700px) {
+  .cartPage {
+    padding: 1.25rem 0.75rem 2rem;
+  }
+
+  .pageTitle {
+    font-size: 1.45rem;
+    letter-spacing: 0;
+  }
+
+  .headerRow {
+    align-items: stretch;
+    gap: 0.85rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.85rem;
+  }
+
+  .clearCartBtn {
+    align-self: center;
+    font-size: 0.68rem;
+    justify-content: center;
+    padding: 0.45rem 0.75rem;
+  }
+
+  .content {
+    gap: 1.25rem;
+  }
+
+  .itemsList {
+    gap: 0.75rem;
+  }
+
+  .item {
+    align-items: flex-start;
+    border: 1px solid var(--border);
+    border-bottom: 2px solid var(--secondary);
+    display: grid;
+    gap: 0.75rem 0.85rem;
+    grid-template-columns: 74px minmax(0, 1fr);
+    padding: 0.85rem;
+    text-align: left;
+  }
+
+  .itemImage {
+    height: 86px;
+    max-width: none;
+    padding: 0.45rem;
+    width: 74px;
+  }
+
+  .itemInfo {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .itemTitle {
+    display: -webkit-box;
+    font-size: 0.78rem;
+    line-height: 1.25;
+    margin-bottom: 0.35rem;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .itemPrice {
+    font-size: 0.86rem;
+    margin-bottom: 0.7rem;
+  }
+
+  .controls {
+    flex-direction: row;
+    gap: 0.65rem;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .quantity {
+    border-width: 1px;
+  }
+
+  .quantity button {
+    height: 30px;
+    width: 30px;
+  }
+
+  .quantity span {
+    font-size: 0.85rem;
+    width: 34px;
+  }
+
+  .removeBtn {
+    height: 32px;
+    width: 32px;
+  }
+
+  .itemSubtotal {
+    border-top: 1px solid var(--border);
+    font-size: 0.95rem;
+    grid-column: 2;
+    padding-top: 0.55rem;
+    text-align: left;
+    width: 100%;
+  }
+
+  .summaryCard {
+    padding: 1.25rem;
+  }
+
+  .summaryCard h3 {
+    font-size: 0.95rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.9rem;
+  }
+
+  .summaryLine {
+    font-size: 0.75rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .totalLine {
+    font-size: 1.15rem;
+    margin-top: 1.1rem;
+    padding-top: 1rem;
+  }
+
+  .checkoutBtn {
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    margin: 1.25rem 0 0.85rem;
+    padding: 0.95rem;
+  }
+
+  .continueLink {
+    font-size: 0.72rem;
+  }
+
+  .emptyCart {
+    gap: 1.25rem;
+    min-height: calc(100vh - 140px);
+    padding: 2rem 1rem;
+  }
+
+  .emptyCart svg {
+    height: 56px;
+    width: 56px;
+  }
+
+  .emptyCart p {
+    font-size: 0.92rem;
+  }
+
+  .backBtn {
+    padding: 0.95rem 1.4rem;
   }
 }
 
 @media (max-width: 480px) {
   .pageTitle {
-    font-size: 1.75rem;
+    font-size: 1.35rem;
   }
   
-  .totalLine {
-    font-size: 1.5rem;
+  .cartPage {
+    padding-inline: 0.5rem;
+  }
+
+  .item {
+    grid-template-columns: 66px minmax(0, 1fr);
+    gap: 0.65rem;
+    padding: 0.75rem;
+  }
+
+  .itemImage {
+    height: 78px;
+    width: 66px;
+  }
+
+  .itemTitle {
+    font-size: 0.74rem;
+  }
+
+  .itemPrice,
+  .itemSubtotal {
+    font-size: 0.84rem;
   }
 
   .emptyCart h2 {

@@ -116,6 +116,30 @@ export function Home() {
 
   if (error) return <div className={styles.error}>{error}</div>;
 
+  const renderHeroSlider = (frameClassName: string) => (
+    <div className={frameClassName}>
+      <AnimatePresence>
+        <motion.img 
+          key={currentImageIndex}
+          src={HERO_IMAGES[currentImageIndex]} 
+          alt="Beauty Model Editorial" 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 4.0, ease: "linear" }}
+          className={styles.editorialImage}
+        />
+      </AnimatePresence>
+      <div className={styles.goldLine} />
+      
+      <div className={styles.slideIndicators}>
+        {HERO_IMAGES.map((_, i) => (
+          <div key={i} className={`${styles.dot} ${i === currentImageIndex ? styles.dotActive : ''}`} />
+        ))}
+      </div>
+    </div>
+  );
+
   return (
     <div className={styles.home}>
       {/* Hero Section Editorial: Slide de imagens com animações suaves */}
@@ -128,6 +152,9 @@ export function Home() {
             <span className={styles.badge}><Sparkles size={14} /> Coleção Exclusiva</span>
             <h1 className={styles.heroTitle}>Beleza <span>Redefinida</span></h1>
             <p className={styles.heroDescription}>Produtos de alta performance com acabamento profissional para realçar o que há de melhor em você.</p>
+            <div className={styles.mobileHeroSlider}>
+              {renderHeroSlider(`${styles.imageFrame} ${styles.mobileImageFrame}`)}
+            </div>
             <div className={styles.heroActions}>
               <button onClick={scrollToProducts} className={styles.primaryBtn}>Comprar Agora <ArrowRight size={18} /></button>
               <button onClick={scrollToProducts} className={styles.secondaryBtn}>Ver Coleção</button>
@@ -135,27 +162,7 @@ export function Home() {
           </motion.div>
           
           <motion.div className={styles.heroImage} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }}>
-            <div className={styles.imageFrame}>
-              <AnimatePresence>
-                <motion.img 
-                  key={currentImageIndex}
-                  src={HERO_IMAGES[currentImageIndex]} 
-                  alt="Beauty Model Editorial" 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 4.0, ease: "linear" }}
-                  className={styles.editorialImage}
-                />
-              </AnimatePresence>
-              <div className={styles.goldLine} />
-              
-              <div className={styles.slideIndicators}>
-                {HERO_IMAGES.map((_, i) => (
-                  <div key={i} className={`${styles.dot} ${i === currentImageIndex ? styles.dotActive : ''}`} />
-                ))}
-              </div>
-            </div>
+            {renderHeroSlider(styles.imageFrame)}
           </motion.div>
         </div>
       </section>
