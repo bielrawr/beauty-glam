@@ -1,6 +1,8 @@
 # BEAUTYGLAM - E-commerce de Maquiagem
 
-BEAUTYGLAM é uma aplicação de e-commerce de maquiagem construída com React, TypeScript, Firebase e integração com Mercado Pago. O projeto simula uma loja virtual completa, com vitrine de produtos, autenticação, carrinho persistente, lista de desejos, perfil do usuário, endereços, checkout, cupons, pedidos e integração backend para criação de preferência de pagamento.
+BEAUTYGLAM é uma aplicação de e-commerce de maquiagem construída com React, TypeScript e Firebase. O projeto simula uma loja virtual completa, com vitrine de produtos, autenticação, carrinho persistente, lista de desejos, perfil do usuário, endereços, checkout, cupons, pedidos e pagamento demonstrativo para hospedagem estática.
+
+> Versão de demonstração para portfolio: o gateway Mercado Pago foi desativado temporariamente para publicação na Netlify. O checkout salva o pedido no Firestore com pagamento simulado, sem backend local e sem solicitar dados reais de cartão. O checkpoint `checkpoint-before-netlify-demo-payment` preserva a versão anterior com Mercado Pago.
 
 O foco do desenvolvimento foi criar uma experiência de compra moderna, responsiva e funcional, aplicando conceitos de arquitetura frontend, gerenciamento de estado, persistência local/remota, rotas protegidas, integração com APIs externas e separação clara entre interface, serviços e regras de negócio.
 
@@ -13,8 +15,8 @@ Este projeto foi desenvolvido para demonstrar, em um cenário realista de loja o
 - Gerenciamento de estado global com Context API, reducers e hooks.
 - Autenticação com Firebase Auth.
 - Persistência de dados com Firestore.
-- Integração entre frontend e backend.
-- Integração com gateway de pagamento em ambiente sandbox.
+- Integração com serviços externos quando necessário.
+- Simulação de pagamento para ambiente público de demonstração.
 - Boas práticas de UX para fluxo de compra.
 - Layout responsivo e visual orientado ao segmento de beleza.
 - Validação de formulários e tratamento de estados de carregamento/erro.
@@ -31,7 +33,7 @@ A BEAUTYGLAM funciona como uma loja de maquiagem com fluxo completo:
 6. Ao fazer login, carrinho e lista de desejos são sincronizados com a nuvem.
 7. O usuário pode editar dados pessoais, salvar endereços e consultar pedidos.
 8. No checkout, o endereço é carregado automaticamente a partir do perfil.
-9. O usuário pode aplicar cupons e gerar uma preferência de pagamento via Mercado Pago.
+9. O usuário pode aplicar cupons e finalizar um pedido com pagamento simulado.
 10. Após a confirmação, o carrinho é limpo e o pedido fica registrado no Firestore.
 
 ## Stack Utilizada
@@ -46,16 +48,6 @@ A BEAUTYGLAM funciona como uma loja de maquiagem com fluxo completo:
 - Framer Motion
 - Lucide React
 - Firebase SDK
-- Mercado Pago SDK React
-
-### Backend
-
-- Node.js
-- Express
-- CORS
-- Dotenv
-- Mercado Pago SDK
-
 ### Banco e autenticação
 
 - Firebase Authentication
@@ -66,7 +58,7 @@ A BEAUTYGLAM funciona como uma loja de maquiagem com fluxo completo:
 
 - Makeup API para carregamento de produtos.
 - ViaCEP para preenchimento automático de endereços.
-- Mercado Pago para geração de preferência de pagamento.
+- Checkout demonstrativo sem gateway externo na versão hospedada.
 
 ## Funcionalidades Implementadas
 
@@ -530,8 +522,8 @@ Funcionalidades:
 - Edição rápida do endereço de entrega.
 - Busca de endereço por CEP.
 - Criação de pedido no Firestore.
-- Criação de preferência de pagamento no backend.
-- Renderização do Wallet Brick do Mercado Pago.
+- Pagamento simulado para demonstração pública.
+- Modal de aprovação sem redirecionar para gateway externo.
 
 Fluxo do checkout:
 
@@ -541,10 +533,10 @@ Fluxo do checkout:
 4. Se houver endereço salvo, ele é preenchido automaticamente.
 5. Usuário pode editar endereço ou aplicar cupom.
 6. Ao finalizar, o app valida campos obrigatórios do endereço.
-7. Cria um pedido com status `pending`.
-8. Envia os itens para o backend.
-9. O backend cria uma preferência no Mercado Pago.
-10. O frontend renderiza o botão de pagamento.
+7. Cria um pedido com status `paid` para demonstração.
+8. Simula o processamento do pagamento.
+9. Exibe confirmação do pedido.
+10. Limpa o carrinho após a aprovação simulada.
 
 Cupons implementados:
 
@@ -568,7 +560,6 @@ Arquivos principais:
 
 - `src/pages/Checkout.tsx`
 - `src/services/orderService.ts`
-- `backend/index.js`
 
 ### Pedidos
 
@@ -606,48 +597,27 @@ Arquivos principais:
 - `src/pages/Checkout.tsx`
 - `src/pages/OrderSuccess.tsx`
 
-### Integração Mercado Pago
+### Pagamento demonstrativo
 
-A integração com Mercado Pago foi separada em frontend e backend.
+A versão atual está preparada para hospedagem estática na Netlify.
 
-Frontend:
+Por isso, o checkout não chama backend local e não abre gateway externo.
 
-- Inicializa o SDK React do Mercado Pago.
-- Solicita ao backend a criação da preferência.
-- Recebe o `preferenceId`.
-- Renderiza o componente `Wallet`.
+Fluxo implementado:
 
-Backend:
+- Valida perfil e endereço.
+- Cria pedido no Firestore.
+- Marca o pedido como `paid` em modo demonstração.
+- Exibe modal de aprovação.
+- Limpa o carrinho.
 
-- Expõe a rota `POST /create-preference`.
-- Recebe os itens do carrinho.
-- Cria uma preferência com o SDK do Mercado Pago.
-- Retorna o ID da preferência para o frontend.
+Checkpoint de restauração:
 
-Arquivo backend:
-
-- `backend/index.js`
-
-Rota:
-
-```http
-POST /create-preference
+```bash
+git checkout checkpoint-before-netlify-demo-payment
 ```
 
-Exemplo de payload:
-
-```json
-{
-  "items": [
-    {
-      "title": "Produto",
-      "unit_price": 49.9,
-      "quantity": 1,
-      "currency_id": "BRL"
-    }
-  ]
-}
-```
+Esse checkpoint retorna para o estado anterior à substituição temporária do Mercado Pago.
 
 Resposta esperada:
 
@@ -911,9 +881,9 @@ Checkout
   -> valida endereço
   -> aplica cupom
   -> cria pedido no Firestore
-  -> chama backend Express
-  -> backend cria preferência Mercado Pago
-  -> frontend renderiza Wallet Brick
+  -> simula pagamento aprovado
+  -> limpa carrinho
+  -> exibe confirmação
 ```
 
 ## Rotas da Aplicação
@@ -1034,7 +1004,7 @@ Arquivo:
 - Node.js
 - npm
 - Conta/projeto Firebase configurado
-- Credenciais do Mercado Pago para ambiente sandbox ou produção
+- Não é necessário backend de pagamento para a versão de demonstração
 
 ### Instalar dependências do frontend
 
@@ -1052,25 +1022,6 @@ O frontend ficará disponível em:
 
 ```text
 http://localhost:5173
-```
-
-### Instalar dependências do backend
-
-```bash
-cd backend
-npm install
-```
-
-### Rodar o backend
-
-```bash
-node index.js
-```
-
-O backend ficará disponível em:
-
-```text
-http://localhost:3001
 ```
 
 ### Build de produção
@@ -1104,23 +1055,16 @@ Serviços usados:
 - `getAuth`
 - `getFirestore`
 
-## Configuração do Mercado Pago
+## Configuração do Pagamento
 
-Frontend:
+A versão atual usa pagamento simulado em `src/pages/Checkout.tsx`.
 
-- Inicialização em `src/pages/Checkout.tsx`.
-- Uso do componente `Wallet`.
+Esse modo foi escolhido para demonstração pública na Netlify, evitando backend local, credenciais sensíveis e envio de dados reais de pagamento.
 
-Backend:
+Para restaurar a versão anterior com Mercado Pago, use o checkpoint:
 
-- Configuração em `backend/index.js`.
-- Uso de `MercadoPagoConfig`.
-- Criação de preferência com `Preference`.
-
-Variável de ambiente recomendada:
-
-```env
-ACCESS_TOKEN=seu_access_token_do_mercado_pago
+```bash
+git checkout checkpoint-before-netlify-demo-payment
 ```
 
 ## Decisões Técnicas
