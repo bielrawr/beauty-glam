@@ -23,6 +23,8 @@ type CheckoutDialog = {
   onConfirm?: () => void;
 };
 
+const BACKEND_BASE_URL = (import.meta.env.VITE_BACKEND_URL || (import.meta.env.PROD ? '/_/backend' : 'http://localhost:3001')).replace(/\/$/, '');
+
 type CheckoutAddress = Omit<Address, 'id'> & { id?: number };
 type ProfileStep = 'personal' | 'address' | null;
 
@@ -271,7 +273,7 @@ export function Checkout() {
         address: orderAddress,
       });
 
-      const response = await fetch('http://localhost:3001/create-preference', {
+      const response = await fetch(`${BACKEND_BASE_URL}/create-preference`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -7,6 +7,20 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+const getFrontendUrl = (req) => {
+  const configuredUrl = process.env.FRONTEND_URL || process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL;
+
+  if (configuredUrl) {
+    const url = configuredUrl.startsWith('http') ? configuredUrl : `https://${configuredUrl}`;
+    return url.replace(/\/$/, '');
+  }
+
+  const requestOrigin = req.get('origin');
+  if (requestOrigin) return requestOrigin.replace(/\/$/, '');
+
+  return 'http://localhost:5173';
+};
+
 /**
  * Configuração do Mercado Pago utilizando o access token do ambiente ou um fallback de teste.
  */
@@ -21,15 +35,16 @@ const client = new MercadoPagoConfig({
 app.post('/create-preference', async (req, res) => {
   try {
     const preference = new Preference(client);
+    const frontendUrl = getFrontendUrl(req);
     
     // Versão ultra-simplificada para evitar erros de validação da API
     const response = await preference.create({
       body: {
         items: req.body.items,
         back_urls: {
-          success: "http://localhost:5173/order-success",
-          failure: "http://localhost:5173/checkout",
-          pending: "http://localhost:5173/checkout"
+          success: `${frontendUrl}/order-success`,
+          failure: `${frontendUrl}/checkout`,
+          pending: `${frontendUrl}/checkout`
         }
       }
     });
@@ -44,7 +59,11 @@ app.post('/create-preference', async (req, res) => {
   }
 });
 
-const PORT = 3001;
-app.listen(PORT, () => {
-  console.log(`Backend rodando em http://localhost:${PORT}`);
-});
+if (require.main === module) {
+  const PORT = process.env.PORT || 3001;
+  app.listen(PORT, () => {
+    console.log(`Backend rodando em http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;
