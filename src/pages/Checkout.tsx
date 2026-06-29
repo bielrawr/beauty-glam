@@ -1,5 +1,4 @@
 import { type FormEvent, useEffect, useState } from 'react';
-import { initMercadoPago, Wallet } from '@mercadopago/sdk-react';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -13,8 +12,6 @@ import { getProfileCompletion } from '../utils/profileCompletion';
 import { Address } from '../types';
 import styles from './Checkout.module.css';
 
-initMercadoPago('TEST-0f329bbe-c54d-4117-8e61-bf09d0f590d8', { locale: 'pt-BR' });
-
 type CheckoutDialog = {
   title: string;
   message: string;
@@ -22,8 +19,6 @@ type CheckoutDialog = {
   confirmLabel?: string;
   onConfirm?: () => void;
 };
-
-const BACKEND_BASE_URL = (import.meta.env.VITE_BACKEND_URL || (import.meta.env.PROD ? '/_/backend' : 'http://localhost:3001')).replace(/\/$/, '');
 
 type CheckoutAddress = Omit<Address, 'id'> & { id?: number };
 type ProfileStep = 'personal' | 'address' | null;
@@ -77,7 +72,6 @@ export function Checkout() {
   const { user, profile, loadingAuth, refreshProfile } = useAuth();
   const navigate = useNavigate();
   
-  const [preferenceId, setPreferenceId] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [dialog, setDialog] = useState<CheckoutDialog | null>(null);
   const [profileStep, setProfileStep] = useState<ProfileStep>(null);
@@ -260,40 +254,31 @@ export function Checkout() {
     if (!user) return;
     
     setIsProcessing(true);
-    setPreferenceId(null);
-
     const orderAddress = normalizeAddress(addressOverride);
 
     try {
+      await new Promise((resolve) => setTimeout(resolve, 900));
+
       await createOrder({
         userId: user.uid,
         items: cart.items,
         totalPrice: finalTotal,
-        status: 'pending', 
+        status: 'paid', 
         address: orderAddress,
       });
 
-      const response = await fetch(`${BACKEND_BASE_URL}/create-preference`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: cart.items.map(i => ({
-            title: i.title,
-            unit_price: Number(i.price.toFixed(2)),
-            quantity: i.quantity,
-            currency_id: 'BRL'
-          })),
-        })
+      setDialog({
+        title: 'Pagamento simulado aprovado',
+        message: 'Seu pedido foi registrado com sucesso. Nenhum dado de cartão foi solicitado, salvo ou enviado para gateway de pagamento.',
+        variant: 'success',
+        confirmLabel: 'Ver confirmação',
+        onConfirm: () => navigate('/order-success'),
       });
-
-      if (!response.ok) throw new Error("Erro no servidor.");
-      const data = await response.json();
-      if (data.id) setPreferenceId(data.id);
     } catch (error) {
       console.error(error);
       setDialog({
-        title: 'Pagamento indisponível',
-        message: 'Não foi possível conectar com o Mercado Pago.\nTente novamente em alguns instantes.',
+        title: 'Não foi possível simular o pagamento',
+        message: 'O pedido não pôde ser registrado agora.\nTente novamente em alguns instantes.',
         variant: 'error',
       });
     } finally {
@@ -764,29 +749,17 @@ export function Checkout() {
             </div>
             
             <div className={styles.finalAction}>
-              {preferenceId ? (
-                <div key={preferenceId} className={styles.mercadopagoContainer}>
-                  <Wallet 
-                    initialization={{ preferenceId }} 
-                    customization={{
-                      theme: 'dark',
-                      customStyle: { buttonBackground: 'black', borderRadius: '0px' },
-                    }} 
-                  />
-                </div>
-              ) : (
-                <button 
-                  className={styles.payButtonMP}
-                  onClick={handleFinalizeOrder}
-                  disabled={isProcessing}
-                >
-                  {isProcessing ? (
-                    <Loader2 className={styles.spinner} size={20} />
-                  ) : (
-                    "FINALIZAR PEDIDO"
-                  )}
-                </button>
-              )}
+              <button 
+                className={styles.payButtonMP}
+                onClick={handleFinalizeOrder}
+                disabled={isProcessing}
+              >
+                {isProcessing ? (
+                  <Loader2 className={styles.spinner} size={20} />
+                ) : (
+                  "SIMULAR PAGAMENTO"
+                )}
+              </button>
             </div>
           </div>
         </section>
@@ -794,3 +767,4 @@ export function Checkout() {
     </main>
   );
 }
+
