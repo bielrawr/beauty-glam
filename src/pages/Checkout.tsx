@@ -1,4 +1,5 @@
 import { type FormEvent, useEffect, useState } from 'react';
+import { initMercadoPago, Wallet } from '@mercadopago/sdk-react';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -11,6 +12,8 @@ import { getCPFValidationError, getPhoneValidationError, maskCEP, maskCPF, maskP
 import { getProfileCompletion } from '../utils/profileCompletion';
 import { Address } from '../types';
 import styles from './Checkout.module.css';
+
+initMercadoPago('TEST-0f329bbe-c54d-4117-8e61-bf09d0f590d8', { locale: 'pt-BR' });
 
 type CheckoutDialog = {
   title: string;
@@ -68,10 +71,11 @@ function normalizeAddress(address: CheckoutAddress): Address {
 }
 
 export function Checkout() {
-  const { cart, totalPrice, clearCart } = useCart();
+  const { cart, totalPrice } = useCart();
   const { user, profile, loadingAuth, refreshProfile } = useAuth();
   const navigate = useNavigate();
   
+  const [preferenceId, setPreferenceId] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [dialog, setDialog] = useState<CheckoutDialog | null>(null);
   const [profileStep, setProfileStep] = useState<ProfileStep>(null);
@@ -254,33 +258,40 @@ export function Checkout() {
     if (!user) return;
     
     setIsProcessing(true);
+    setPreferenceId(null);
 
     const orderAddress = normalizeAddress(addressOverride);
 
     try {
-      const orderId = await createOrder({
+      await createOrder({
         userId: user.uid,
         items: cart.items,
         totalPrice: finalTotal,
-        status: 'paid',
+        status: 'pending', 
         address: orderAddress,
       });
 
-      await new Promise(resolve => setTimeout(resolve, 850));
-      clearCart();
-
-      setDialog({
-        title: 'Pedido aprovado',
-        message: `Pagamento simulado com sucesso.\nPedido ${orderId.slice(-8).toUpperCase()} salvo para demonstração.`,
-        variant: 'success',
-        confirmLabel: 'Voltar à vitrine',
-        onConfirm: () => navigate('/'),
+      const response = await fetch('http://localhost:3001/create-preference', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: cart.items.map(i => ({
+            title: i.title,
+            unit_price: Number(i.price.toFixed(2)),
+            quantity: i.quantity,
+            currency_id: 'BRL'
+          })),
+        })
       });
+
+      if (!response.ok) throw new Error("Erro no servidor.");
+      const data = await response.json();
+      if (data.id) setPreferenceId(data.id);
     } catch (error) {
       console.error(error);
       setDialog({
-        title: 'Pedido não finalizado',
-        message: 'Não foi possível salvar o pedido de demonstração.\nTente novamente em alguns instantes.',
+        title: 'Pagamento indisponível',
+        message: 'Não foi possível conectar com o Mercado Pago.\nTente novamente em alguns instantes.',
         variant: 'error',
       });
     } finally {
@@ -751,25 +762,29 @@ export function Checkout() {
             </div>
             
             <div className={styles.finalAction}>
-              <div className={styles.demoPaymentBox}>
-                <span>Modo demonstração</span>
-                <p>O pedido será aprovado de forma simulada, sem abrir gateway externo ou solicitar dados de cartão.</p>
-              </div>
-
-              <button 
-                className={styles.payButtonMP}
-                onClick={handleFinalizeOrder}
-                disabled={isProcessing}
-              >
-                {isProcessing ? (
-                  <>
+              {preferenceId ? (
+                <div key={preferenceId} className={styles.mercadopagoContainer}>
+                  <Wallet 
+                    initialization={{ preferenceId }} 
+                    customization={{
+                      theme: 'dark',
+                      customStyle: { buttonBackground: 'black', borderRadius: '0px' },
+                    }} 
+                  />
+                </div>
+              ) : (
+                <button 
+                  className={styles.payButtonMP}
+                  onClick={handleFinalizeOrder}
+                  disabled={isProcessing}
+                >
+                  {isProcessing ? (
                     <Loader2 className={styles.spinner} size={20} />
-                    Processando simulação...
-                  </>
-                ) : (
-                  'Finalizar pedido demonstrativo'
-                )}
-              </button>
+                  ) : (
+                    "FINALIZAR PEDIDO"
+                  )}
+                </button>
+              )}
             </div>
           </div>
         </section>
