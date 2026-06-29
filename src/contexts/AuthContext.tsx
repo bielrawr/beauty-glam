@@ -58,6 +58,21 @@ const getPasswordResetSettings = () => ({
   handleCodeInApp: false,
 });
 
+function createAuthError(code: string, message: string) {
+  const error = new Error(message) as Error & { code: string };
+  error.code = code;
+  return error;
+}
+
+function ensureGoogleAuthOrigin() {
+  if (window.location.hostname === '127.0.0.1') {
+    throw createAuthError(
+      'auth/loopback-ip-not-authorized',
+      'Use localhost instead of 127.0.0.1 for Google login.'
+    );
+  }
+}
+
 /**
  * AuthProvider: Gerencia o estado global de autenticação e perfil do usuário.
  * Implementa cache local para carregamento instantâneo do nome do usuário no Header.
@@ -152,23 +167,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
    * Autenticação via Google Popup. Gerencia a criação automática de perfil para novos usuários sociais.
    */
   async function loginWithGoogle() {
+    ensureGoogleAuthOrigin();
     const cred = await signInWithPopup(auth, googleProvider);
-    const existingProfile = await getUserProfile(cred.user.uid);
-    if (!existingProfile) {
-      const newProfile = {
-        email: cred.user.email || '',
-        displayName: cred.user.displayName || cred.user.email?.split('@')[0] || '',
-        photoURL: cred.user.photoURL || undefined,
-        customerId: generateCustomerId(),
-        addresses: []
-      };
-      await createUserProfile(cred.user.uid, newProfile);
-      setProfile(newProfile);
-      localStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(newProfile));
-    } else {
-      setProfile(existingProfile as UserProfile);
-      localStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(existingProfile));
+    const fallbackProfile: UserProfile = {
+      email: cred.user.email || '',
+      displayName: cred.user.displayName || cred.user.email?.split('@')[0] || '',
+      photoURL: cred.user.photoURL || undefined,
+      customerId: generateCustomerId(),
+      addresses: []
+    };
+
+    try {
+      const existingProfile = await getUserProfile(cred.user.uid);
+      if (!existingProfile) {
+        await createUserProfile(cred.user.uid, fallbackProfile);
+        setProfile(fallbackProfile);
+        localStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(fallbackProfile));
+      } else {
+        setProfile(existingProfile as UserProfile);
+        localStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(existingProfile));
+      }
+    } catch (error) {
+      console.error("Erro ao sincronizar perfil do Google:", error);
+      setProfile(fallbackProfile);
+      localStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(fallbackProfile));
     }
+
     return cred;
   }
 

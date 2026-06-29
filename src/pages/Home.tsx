@@ -7,14 +7,71 @@ import { Sparkles, ArrowRight, SearchX } from 'lucide-react';
 
 /**
  * Assets oficiais para o slide da Hero Section.
+ * Ficam em public/assets para serem servidos como caminhos globais no Netlify.
  */
 const HERO_IMAGES = [
-  "/src/assets/hero-editorial.jpg",
-  "/src/assets/hero-2.jpg",
-  "/src/assets/hero-3.jpg",
-  "/src/assets/hero-4.jpg",
-  "/src/assets/hero-5.jpg"
+  '/assets/hero-editorial.jpg',
+  '/assets/hero-2.jpg',
+  '/assets/hero-3.jpg',
+  '/assets/hero-4.jpg',
+  '/assets/hero-5.jpg'
 ];
+
+const SKELETON_FILTERS = Array.from({ length: 6 }, (_, index) => index);
+const SKELETON_PRODUCTS = Array.from({ length: 8 }, (_, index) => index);
+
+function HomeSkeleton() {
+  return (
+    <div className={styles.home} aria-busy="true" aria-label="Carregando conteudo">
+      <section className={`${styles.hero} ${styles.skeletonHero}`}>
+        <div className={`container ${styles.heroContainer}`}>
+          <div className={styles.heroContent}>
+            <div className={`${styles.skeletonBlock} ${styles.skeletonBadge}`} />
+            <div className={`${styles.skeletonBlock} ${styles.skeletonTitle}`} />
+            <div className={`${styles.skeletonBlock} ${styles.skeletonTitleShort}`} />
+            <div className={`${styles.skeletonBlock} ${styles.skeletonText}`} />
+            <div className={`${styles.skeletonBlock} ${styles.skeletonTextShort}`} />
+            <div className={styles.skeletonActions}>
+              <div className={`${styles.skeletonBlock} ${styles.skeletonButton}`} />
+              <div className={`${styles.skeletonBlock} ${styles.skeletonButton}`} />
+            </div>
+          </div>
+
+          <div className={styles.heroImage}>
+            <div className={`${styles.imageFrame} ${styles.skeletonFrame}`}>
+              <div className={`${styles.skeletonBlock} ${styles.skeletonImage}`} />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className={styles.productsSection}>
+        <div className="container">
+          <div className={styles.sectionHeader}>
+            <div className={`${styles.skeletonBlock} ${styles.skeletonSectionTitle}`} />
+            <div className={styles.skeletonFilterBar}>
+              {SKELETON_FILTERS.map((item) => (
+                <div key={item} className={`${styles.skeletonBlock} ${styles.skeletonFilter}`} />
+              ))}
+            </div>
+          </div>
+
+          <div className={styles.grid}>
+            {SKELETON_PRODUCTS.map((item) => (
+              <div key={item} className={styles.skeletonCard}>
+                <div className={`${styles.skeletonBlock} ${styles.skeletonCardImage}`} />
+                <div className={`${styles.skeletonBlock} ${styles.skeletonCardCategory}`} />
+                <div className={`${styles.skeletonBlock} ${styles.skeletonCardTitle}`} />
+                <div className={`${styles.skeletonBlock} ${styles.skeletonCardTitleShort}`} />
+                <div className={`${styles.skeletonBlock} ${styles.skeletonCardPrice}`} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
 
 /**
  * Página Inicial (Home): Ponto de entrada principal da loja.
@@ -31,6 +88,13 @@ export function Home() {
    */
   useEffect(() => {
     window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
+    HERO_IMAGES.forEach((src) => {
+      const image = new Image();
+      image.src = src;
+    });
   }, []);
 
   /**
@@ -93,25 +157,8 @@ export function Home() {
     });
   }, [products, activeCategory, searchQuery]);
 
-  /**
-   * Renderização do Loader Temático (BeautyGlam Luxe).
-   */
   if (loading) {
-    return (
-      <div className={styles.luxuryLoader}>
-        <motion.div 
-          className={styles.loaderLogo}
-          animate={{ scale: [1, 1.1, 1], opacity: [0.5, 1, 0.5] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-        >
-          B<span>G</span>
-        </motion.div>
-        <p>REVELANDO A BELEZA...</p>
-        <motion.div animate={{ rotate: 360 }} transition={{ duration: 4, repeat: Infinity, ease: "linear" }}>
-          <Sparkles size={16} color="var(--accent)" />
-        </motion.div>
-      </div>
-    );
+    return <HomeSkeleton />;
   }
 
   if (error) return <div className={styles.error}>{error}</div>;

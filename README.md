@@ -1030,6 +1030,16 @@ http://localhost:5173
 npm run build
 ```
 
+### Deploy no Netlify
+
+O projeto possui `netlify.toml` e `public/_redirects` para publicação como SPA no Netlify.
+
+Consulte o checklist em:
+
+```text
+NETLIFY_DEPLOY.md
+```
+
 ### Preview do build
 
 ```bash
